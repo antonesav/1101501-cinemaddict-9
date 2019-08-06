@@ -1,7 +1,7 @@
-# Личный проект «Киноман» [![Build status][travis-image]][travis-url]
+﻿# Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Антон Савельев](https://up.htmlacademy.ru/ecmascript/9/user/1101501).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Бабченко](https://up.htmlacademy.ru/ecmascript/9/user/619357).
 
 ---
 
