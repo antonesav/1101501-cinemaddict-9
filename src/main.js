@@ -7,16 +7,13 @@ import {getSortTemplate} from "./components/sort";
 import {getUserTemplate} from "./components/user";
 import {getFilmListTemplate} from "./components/films-list";
 
-const LISTS = {
-  default: 0,
-  mainList: 5,
-  category: 2
-};
+const CARD_COUNT_LIST = 5;
+const CARD_COUNT_CATEGORY = 2;
 const mainElement = document.querySelector(`.main`);
 const headerElement = document.querySelector(`.header`);
 
 const fragmentElement = document.createDocumentFragment();
-const renderComponent = (container, component, repeat = LISTS.default) => {
+const renderComponent = (container, component, repeat = 0) => {
   const divElement = document.createElement(`div`);
   if (repeat) {
     for (let i = 0; i < repeat; i++) {
@@ -41,9 +38,9 @@ const filmsListExtraElements = fragmentElement.querySelectorAll(`.films-list--ex
 const filmsContainerElement = fragmentElement.querySelector(`.films-list__container`);
 
 filmsListExtraElements.forEach((item) =>
-  renderComponent(item, getCardTemplate(), LISTS.category));
+  renderComponent(item, getCardTemplate(), CARD_COUNT_CATEGORY));
 
-renderComponent(filmsContainerElement, getCardTemplate(), LISTS.mainList);
+renderComponent(filmsContainerElement, getCardTemplate(), CARD_COUNT_LIST);
 renderComponent(filmsListElement, getShowButtonTemplate());
 
 mainElement.appendChild(fragmentElement);
