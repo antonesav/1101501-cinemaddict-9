@@ -13,7 +13,7 @@ const mainElement = document.querySelector(`.main`);
 const headerElement = document.querySelector(`.header`);
 
 const fragmentElement = document.createDocumentFragment();
-const renderComponent = (container, component, repeat = 0) => {
+const renderComponent = (container, component, repeat) => {
   const divElement = document.createElement(`div`);
   if (repeat) {
     for (let i = 0; i < repeat; i++) {
