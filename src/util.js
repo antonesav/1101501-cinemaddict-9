@@ -6,7 +6,7 @@ export const getRandomRating = (count) => {
   return parseFloat((Math.random() * count).toFixed(1));
 };
 
-export const getRandomDate = (min, max) => {
+export const getRandomNumberInRange = (min, max) => {
   let rand = min - 0.5 + Math.random() * (max - min + 1);
   return Math.round(rand);
 };
@@ -23,26 +23,18 @@ export const generateDescription = (string) => {
   return str[getRandomNumber(str.length)];
 };
 
-export const getRandomValue = (obj, key) => {
-  const currentKey = obj[key];
-  const currentKeyLength = currentKey.length;
-  return currentKey[getRandomNumber(currentKeyLength)];
+export const getRandomValue = (arr) => {
+  const currentArrLength = arr.length;
+  return arr[getRandomNumber(currentArrLength)];
 };
 
-export const getRandomWriters = (obj, key) => {
-  const currentKey = obj[key];
-  const currentKeyLength = currentKey.length;
-  return currentKey.slice(getRandomNumber(1), getRandomNumber(currentKeyLength)).join(`, `);
-};
-
-export const getRandomGenres = (obj, key) => {
-  const currentKey = obj[key];
-  const currentKeyLength = currentKey.length;
-  return currentKey.slice(getRandomNumber(1), getRandomNumber(currentKeyLength));
+export const getRandomList = (arr) => {
+  const currentArrLength = arr.length;
+  return arr.slice(0, getRandomNumberInRange(1, currentArrLength)).join(`, `);
 };
 
 export const getRandomRealise = () => {
-  const randomDay = new Date(getRandomDate(1900, 2019), getRandomDate(0, 11), getRandomDate(1, 31)
+  const randomDay = new Date(getRandomNumberInRange(1900, 2019), getRandomNumberInRange(0, 11), getRandomNumberInRange(1, 31)
   ).toLocaleDateString(`en-GB`, {
     day: `numeric`,
     month: `short`,

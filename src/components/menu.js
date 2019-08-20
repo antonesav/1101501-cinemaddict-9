@@ -18,7 +18,7 @@ const renderFilter = (filter) => {
 const getFilters = (markup) => markup.map((filter) => renderFilter(filter));
 
 const fillFilters = (cards) => {
-  cards.map((item) => {
+  cards.forEach((item) => {
     filterCount.watchlist += item.isWatchlist ? 1 : 0;
     filterCount.history += item.isWatched ? 1 : 0;
     filterCount.favorites += item.isFavorite ? 1 : 0;

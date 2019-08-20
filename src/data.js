@@ -2,12 +2,12 @@ import {getRandomNumber} from "./util";
 import {getRandomValue} from "./util";
 import {getRandomBoolean} from "./util";
 import {getRandomRating} from "./util";
-import {getRandomDate} from "./util";
+import {getRandomNumberInRange} from "./util";
 import {getRandomDuration} from "./util";
 import {generateDescription} from "./util";
-import {getRandomWriters} from "./util";
+import {getRandomList} from "./util";
 import {getRandomRealise} from "./util";
-import {getRandomGenres} from "./util";
+// import {getRandomGenres} from "./util";
 
 const CARD_COUNT = 20;
 const COMMENT_COUNT = 4;
@@ -26,14 +26,15 @@ const dataMock = {
   actors: [`Steven Soderbergh`, `Hannah Patterson`, `David Lynch`, `Joel and Ethan Coen`, `Donald Richie`, `Spencer Moon`, `Martin Scorsese`],
   country: [`USA`, `Russia`, `Greece`, `Serbia`, `Spain`],
   avatar: [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`, `trophy.png`],
+  age: [`0`, `8`, `10`, `12`, `16`, `18`],
 };
 
 const getComments = (count) => {
   const commentsArr = new Array(count);
   return [...commentsArr].map(() => {
     return {
-      avatar: getRandomValue(dataMock, `avatar`),
-      name: getRandomValue(dataMock, `writers`),
+      avatar: getRandomValue(dataMock.avatar),
+      name: getRandomValue(dataMock.writers),
       text: generateDescription(dataMock.description),
       date: getRandomNumber(100),
     };
@@ -42,31 +43,32 @@ const getComments = (count) => {
 
 export const getCard = () => {
   return {
-    title: getRandomValue(dataMock, `titles`),
+    title: getRandomValue(dataMock.titles),
     rating: getRandomRating(10),
-    year: getRandomDate(1900, 2019),
+    year: getRandomNumberInRange(1900, 2019),
     duration: getRandomDuration(),
-    genre: getRandomValue(dataMock, `genres`),
-    poster: getRandomValue(dataMock, `posters`),
+    genre: getRandomValue(dataMock.genres),
+    poster: getRandomValue(dataMock.posters),
     description: generateDescription(dataMock.description),
-    comment: getRandomNumber(100),
+    commentsQuantity: getRandomNumber(100),
     isWatchlist: getRandomBoolean(),
     isWatched: getRandomBoolean(),
     isFavorite: getRandomBoolean(),
     popup: {
-      title: getRandomValue(dataMock, `titles`),
-      original: getRandomValue(dataMock, `titles`),
-      director: getRandomValue(dataMock, `directors`),
-      writer: getRandomWriters(dataMock, `writers`),
-      actor: getRandomWriters(dataMock, `actors`),
+      title: getRandomValue(dataMock.titles),
+      original: getRandomValue(dataMock.titles),
+      director: getRandomValue(dataMock.directors),
+      writers: getRandomList(dataMock.writers),
+      actor: getRandomList(dataMock.actors),
       rating: getRandomRating(10),
-      realise: getRandomRealise(),
+      release: getRandomRealise(),
       duration: getRandomDuration(),
-      country: getRandomValue(dataMock, `country`),
-      genres: getRandomGenres(dataMock, `genres`),
-      poster: getRandomValue(dataMock, `posters`),
+      country: getRandomValue(dataMock.country),
+      genres: getRandomList(dataMock.genres),
+      poster: getRandomValue(dataMock.posters),
       description: generateDescription(dataMock.description),
       comments: getComments(COMMENT_COUNT),
+      age: getRandomValue(dataMock.age),
     },
   };
 };

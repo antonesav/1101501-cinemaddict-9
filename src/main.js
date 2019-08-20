@@ -29,20 +29,8 @@ const renderCards = (arrayTasks) => {
 
       let arraySplice = cards.splice(0, count);
 
-      arraySplice.map((item) => container.insertAdjacentHTML(`beforeend`, getCardTemplate(item)));
+      arraySplice.forEach((item) => container.insertAdjacentHTML(`beforeend`, getCardTemplate(item)));
       cardsShow += count;
-    },
-
-    renderPopup: (container, count) => {
-      let arraySplice = cards.splice(0, count);
-
-      arraySplice.map((item) => container.insertAdjacentHTML(`beforeend`, getDetailsTemplate(item.popup)));
-    },
-
-    renderCharts: (container, count) => {
-      let arraySplice = cards.splice(0, count);
-
-      arraySplice.map((item) => container.insertAdjacentHTML(`beforeend`, getDetailsTemplate(item)));
     },
 
     getVisible: () => cardsShow,
@@ -53,9 +41,20 @@ const renderCards = (arrayTasks) => {
   };
 };
 
+const renderPopupCard = (arrayCards, container, count) => {
+  const arraySplice = arrayCards.splice(0, count);
+
+  arraySplice.forEach((item) => container.insertAdjacentHTML(`beforeend`, getDetailsTemplate(item.popup)));
+};
+
+const renderCardInCharts = (arrayCards, container, count) => {
+  const arraySplice = arrayCards.splice(0, count);
+
+  arraySplice.forEach((item) => container.insertAdjacentHTML(`beforeend`, getCardTemplate(item)));
+};
+
 const cardsList = renderCards(mockCards());
-const cardsCharts = renderCards(mockCards());
-const cardPopup = renderCards(mockCards());
+
 footerElement.textContent = `${renderCards(mockCards()).getLength()} movies inside`;
 
 const onLoadClick = () => {
@@ -67,7 +66,7 @@ mainElement.insertAdjacentHTML(`beforeend`, getSortTemplate());
 
 mainElement.insertAdjacentHTML(`beforeend`, getFilmListTemplate());
 
-cardPopup.renderPopup(mainElement, 1);
+renderPopupCard(mockCards(), mainElement, 1);
 
 headerElement.insertAdjacentHTML(`beforeend`, getSearchTemplate());
 headerElement.insertAdjacentHTML(`beforeend`, getUserTemplate());
@@ -77,7 +76,7 @@ const filmsListExtraElements = document.querySelectorAll(`.films-list--extra .fi
 const filmsContainerElement = document.querySelector(`.films-list__container`);
 
 filmsListExtraElements.forEach((item) => {
-  cardsCharts.render(item, CARD_COUNT_CATEGORY);
+  renderCardInCharts(mockCards(), item, CARD_COUNT_CATEGORY);
 });
 
 cardsList.render(filmsContainerElement, DEFAULT_CARD_SHOW);

@@ -1,5 +1,5 @@
 const getGenres = (genres) => {
-  return genres.map((item) => {
+  return genres.split(`,`).map((item) => {
     return `<span class="film-details__genre">${item}</span>`;
   }).join(``);
 };
@@ -23,8 +23,9 @@ const getComment = (comments) => {
   });
 };
 
-export const getDetailsTemplate = ({title, original, director, writer, actor, rating, realise, duration, country, genres, poster, description, comments}) =>
-  `<section class="film-details" style="display: none;">
+export const getDetailsTemplate = (card) => {
+  const {title, original, director, writers, actor, rating, release, duration, country, genres, poster, description, comments, age} = card;
+  return `<section class="film-details" style="display: none;">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
       <div class="film-details__close">
@@ -34,7 +35,7 @@ export const getDetailsTemplate = ({title, original, director, writer, actor, ra
         <div class="film-details__poster">
           <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
 
-          <p class="film-details__age">18+</p>
+          <p class="film-details__age">${age}+</p>
         </div>
 
         <div class="film-details__info">
@@ -56,7 +57,7 @@ export const getDetailsTemplate = ({title, original, director, writer, actor, ra
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writer}</td>
+              <td class="film-details__cell">${writers}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
@@ -64,7 +65,7 @@ export const getDetailsTemplate = ({title, original, director, writer, actor, ra
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${realise}</td>
+              <td class="film-details__cell">${release}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
@@ -140,3 +141,4 @@ export const getDetailsTemplate = ({title, original, director, writer, actor, ra
     </div>
   </form>
 </section>`;
+};
