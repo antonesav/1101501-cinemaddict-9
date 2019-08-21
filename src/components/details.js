@@ -1,11 +1,11 @@
 import {renderItemQuantity} from "../util";
 
 const getGenresQuantity = (genres) => {
-  const genreList = genres.split(`,`).map((item) => {
+  const genreList = genres.map((item) => {
     return `<span class="film-details__genre">${item}</span>`;
   }).join(``);
   return `
-    <td class="film-details__term">${renderItemQuantity(genres.split(`,`).length, `Genre`).word}</td>
+    <td class="film-details__term">${renderItemQuantity(genres.length, `Genre`)}</td>
     <td class="film-details__cell">
         ${genreList}
     </td>
@@ -80,11 +80,11 @@ export const getDetailsTemplate = (card) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writers}</td>
+              <td class="film-details__cell">${writers.join(`, `)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors}</td>
+              <td class="film-details__cell">${actors.join(`, `)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>

@@ -30,7 +30,7 @@ export const getRandomValue = (arr) => {
 
 export const getRandomList = (arr) => {
   const currentArrLength = arr.length;
-  return arr.slice(0, getRandomNumberInRange(1, currentArrLength)).join(`, `);
+  return arr.slice(0, getRandomNumberInRange(1, currentArrLength));
 };
 
 export const getRandomRealise = () => {
@@ -44,10 +44,7 @@ export const getRandomRealise = () => {
 };
 
 export const renderItemQuantity = (count, word) => {
-  return {
-    count: `${count}`,
-    word: `${word}${(count % 10 === 1) ? `` : `s`}`
-  };
+  return `${word}${(count % 10 === 1) ? `` : `s`}`;
 };
 
 export const getRandomBoolean = () => Boolean(Math.round(Math.random()));
