@@ -1,7 +1,15 @@
-const getGenres = (genres) => {
-  return genres.split(`,`).map((item) => {
+import {renderItemQuantity} from "../util";
+
+const getGenresQuantity = (genres) => {
+  const genreList = genres.split(`,`).map((item) => {
     return `<span class="film-details__genre">${item}</span>`;
   }).join(``);
+  return `
+    <td class="film-details__term">${renderItemQuantity(genres.split(`,`).length, `Genre`).word}</td>
+    <td class="film-details__cell">
+        ${genreList}
+    </td>
+  `;
 };
 
 const getComment = (comments) => {
@@ -24,7 +32,22 @@ const getComment = (comments) => {
 };
 
 export const getDetailsTemplate = (card) => {
-  const {title, original, director, writers, actor, rating, release, duration, country, genres, poster, description, comments, age} = card;
+  const {
+    title,
+    original,
+    director,
+    writers,
+    actors,
+    rating,
+    release,
+    duration,
+    country,
+    genres,
+    poster,
+    description,
+    comments,
+    age
+  } = card;
   return `<section class="film-details" style="display: none;">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
@@ -61,7 +84,7 @@ export const getDetailsTemplate = (card) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actor}</td>
+              <td class="film-details__cell">${actors}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -76,9 +99,7 @@ export const getDetailsTemplate = (card) => {
               <td class="film-details__cell">${country}</td>
             </tr>
             <tr class="film-details__row">
-              <td class="film-details__term">Genres</td>
-              <td class="film-details__cell">
-                ${getGenres(genres)}</td>
+              ${getGenresQuantity(genres)}
             </tr>
           </table>
 

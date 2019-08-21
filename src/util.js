@@ -43,4 +43,11 @@ export const getRandomRealise = () => {
   return randomDay;
 };
 
+export const renderItemQuantity = (count, word) => {
+  return {
+    count: `${count}`,
+    word: `${word}${(count % 10 === 1) ? `` : `s`}`
+  };
+};
+
 export const getRandomBoolean = () => Boolean(Math.round(Math.random()));

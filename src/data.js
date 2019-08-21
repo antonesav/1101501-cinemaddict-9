@@ -30,8 +30,7 @@ const dataMock = {
 };
 
 const getComments = (count) => {
-  const commentsArr = new Array(count);
-  return [...commentsArr].map(() => {
+  return new Array(count).fill(``).map(() => {
     return {
       avatar: getRandomValue(dataMock.avatar),
       name: getRandomValue(dataMock.writers),
@@ -59,7 +58,7 @@ export const getCard = () => {
       original: getRandomValue(dataMock.titles),
       director: getRandomValue(dataMock.directors),
       writers: getRandomList(dataMock.writers),
-      actor: getRandomList(dataMock.actors),
+      actors: getRandomList(dataMock.actors),
       rating: getRandomRating(10),
       release: getRandomRealise(),
       duration: getRandomDuration(),
