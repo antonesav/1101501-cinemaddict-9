@@ -1,27 +1,38 @@
-export const getMenuTemplate = () =>
-  `<nav class="main-navigation">
+const stats = [
+  {title: `Watchlist`, count: 0},
+  {title: `History`, count: 0},
+  {title: `Favorites`, count: 0},
+];
+
+const filterCount = {
+  watchlist: 0,
+  history: 0,
+  favorites: 0,
+};
+
+const renderFilter = (filter) => {
+  const {title, count} = filter;
+  return `<a href="#${title}" class="main-navigation__item">${title} <span class="main-navigation__item-count">${count}</span></a>`;
+};
+
+const getFilters = (markup) => markup.map((filter) => renderFilter(filter));
+
+const fillFilters = (cards) => {
+  cards.forEach((item) => {
+    filterCount.watchlist += item.isWatchlist ? 1 : 0;
+    filterCount.history += item.isWatched ? 1 : 0;
+    filterCount.favorites += item.isFavorite ? 1 : 0;
+  });
+  Object.keys(filterCount).forEach((item, index) => {
+    stats[index].count = filterCount[item];
+  });
+};
+
+export const getMenuTemplate = (cards) => {
+  fillFilters(cards);
+  return `<nav class="main-navigation">
       <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-      <a href="#watchlist" class="main-navigation__item">Watchlist <span class="main-navigation__item-count">13</span></a>
-      <a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">4</span></a>
-      <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
+      ${getFilters(stats).join(``)}
       <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
-    </nav>
-    
-    <section class="films">
-      <section class="films-list">
-        <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-      <section class="films-list--extra">
-      <h2 class="films-list__title">Top rated</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-      <section class="films-list--extra">
-      <h2 class="films-list__title">Most commented</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-    </section>
-  `;
+    </nav>`;
+};
