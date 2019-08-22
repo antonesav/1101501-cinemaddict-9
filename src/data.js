@@ -40,37 +40,35 @@ const getComments = (count) => {
   });
 };
 
-export const getCard = () => {
-  return {
+export const getCard = () => ({
+  title: getRandomValue(dataMock.titles),
+  rating: getRandomRating(10),
+  year: getRandomNumberInRange(1900, 2019),
+  duration: getRandomDuration(),
+  genre: getRandomValue(dataMock.genres),
+  poster: getRandomValue(dataMock.posters),
+  description: generateDescription(dataMock.description),
+  commentsQuantity: getRandomNumber(100),
+  isWatchlist: getRandomBoolean(),
+  isWatched: getRandomBoolean(),
+  isFavorite: getRandomBoolean(),
+  popup: {
     title: getRandomValue(dataMock.titles),
+    original: getRandomValue(dataMock.titles),
+    director: getRandomValue(dataMock.directors),
+    writers: getRandomList(dataMock.writers),
+    actors: getRandomList(dataMock.actors),
     rating: getRandomRating(10),
-    year: getRandomNumberInRange(1900, 2019),
+    release: getRandomRealise(),
     duration: getRandomDuration(),
-    genre: getRandomValue(dataMock.genres),
+    country: getRandomValue(dataMock.country),
+    genres: getRandomList(dataMock.genres),
     poster: getRandomValue(dataMock.posters),
     description: generateDescription(dataMock.description),
-    commentsQuantity: getRandomNumber(100),
-    isWatchlist: getRandomBoolean(),
-    isWatched: getRandomBoolean(),
-    isFavorite: getRandomBoolean(),
-    popup: {
-      title: getRandomValue(dataMock.titles),
-      original: getRandomValue(dataMock.titles),
-      director: getRandomValue(dataMock.directors),
-      writers: getRandomList(dataMock.writers),
-      actors: getRandomList(dataMock.actors),
-      rating: getRandomRating(10),
-      release: getRandomRealise(),
-      duration: getRandomDuration(),
-      country: getRandomValue(dataMock.country),
-      genres: getRandomList(dataMock.genres),
-      poster: getRandomValue(dataMock.posters),
-      description: generateDescription(dataMock.description),
-      comments: getComments(COMMENT_COUNT),
-      age: getRandomValue(dataMock.age),
-    },
-  };
-};
+    comments: getComments(COMMENT_COUNT),
+    age: getRandomValue(dataMock.age),
+  },
+});
 
 export const mockCards = () => {
   const cards = [];
