@@ -1,5 +1,24 @@
-export const getFilmListTemplate = () =>
-  `<section class="films">
+import {createElement} from "../util";
+
+class FilmList {
+  constructor() {
+    this._element = null;
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return `<section class="films">
       <section class="films-list">
         <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
         <div class="films-list__container">
@@ -15,5 +34,8 @@ export const getFilmListTemplate = () =>
         <div class="films-list__container">
         </div>
       </section>
-    </section>
-  `;
+    </section>`;
+  }
+}
+
+export default FilmList;

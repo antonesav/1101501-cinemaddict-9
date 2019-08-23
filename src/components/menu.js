@@ -1,3 +1,5 @@
+import {createElement} from "../util";
+
 const stats = [
   {title: `Watchlist`, count: 0},
   {title: `History`, count: 0},
@@ -28,11 +30,32 @@ const fillFilters = (cards) => {
   });
 };
 
-export const getMenuTemplate = (cards) => {
-  fillFilters(cards);
-  return `<nav class="main-navigation">
+class Menu {
+  constructor(cards) {
+    this._cards = cards;
+    this._element = null;
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    fillFilters(this._cards);
+    return `<nav class="main-navigation">
       <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
       ${getFilters(stats).join(``)}
       <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
     </nav>`;
-};
+  }
+}
+
+export default Menu;

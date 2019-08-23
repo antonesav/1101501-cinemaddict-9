@@ -61,7 +61,7 @@ export const createElement = (template) => {
 };
 
 // Рендер и анрендер для компонент
-export const renderUtil = (container, element, place) => {
+export const renderComponent = (container, element, place) => {
   switch (place) {
     case Position.AFTERBEGIN:
       container.prepend(element);
@@ -72,7 +72,7 @@ export const renderUtil = (container, element, place) => {
   }
 };
 
-export const unrender = (element) => {
+export const removeComponent = (element) => {
   if (element) {
     element.remove();
   }
