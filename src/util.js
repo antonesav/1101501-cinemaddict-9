@@ -1,3 +1,4 @@
+export const ESC_KEY = 27;
 export const getRandomNumber = (count) => {
   return Math.floor(Math.random() * count);
 };

@@ -1,8 +1,9 @@
 import {renderItemQuantity} from "../util";
-import {createElement} from "../util";
+import AbstractComponent from "./abstract-component";
 
-class Card {
+class Card extends AbstractComponent {
   constructor({title, rating, year, duration, genre, poster, description, commentsQuantity, isWatchlist, isWatched, isFavorite}) {
+    super();
     this._title = title;
     this._rating = rating;
     this._year = year;
@@ -14,19 +15,6 @@ class Card {
     this._isWatchlist = isWatchlist;
     this._isWatched = isWatched;
     this._isFavorite = isFavorite;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

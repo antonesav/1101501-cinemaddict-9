@@ -1,4 +1,4 @@
-import {createElement} from "../util";
+import AbstractComponent from "./abstract-component";
 
 const stats = [
   {title: `Watchlist`, count: 0},
@@ -30,22 +30,10 @@ const fillFilters = (cards) => {
   });
 };
 
-class Menu {
+class Menu extends AbstractComponent {
   constructor(cards) {
+    super();
     this._cards = cards;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {
