@@ -6,7 +6,7 @@ import Message from "./components/films-list-empty";
 import {mockCards} from "./data";
 import {Position} from "./util";
 import {renderComponent} from "./util";
-import PageController from "./page-conroller";
+import PageController from "./page-controller";
 
 const mainElement = document.querySelector(`.main`);
 const headerElement = document.querySelector(`.header`);

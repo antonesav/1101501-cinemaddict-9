@@ -6,9 +6,9 @@ import FilmList from "./components/films-list";
 import Popup from "./components/details";
 import {ESC_KEY} from "./util";
 
-const DEFAULT_CARD_SHOW = 5;
-const CARDS_COUNT_ON_CLICK = 5;
-const CARD_COUNT_CATEGORY = 2;
+const FILMLIST_CARD_COUNT = 5;
+const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
+const CATEGORY_CARD_COUNT = 2;
 
 class PageController {
   constructor(mainContainer, cards) {
@@ -20,7 +20,6 @@ class PageController {
   }
 
   init() {
-    const cardsList = this._renderCards(this._cards);
 
     renderComponent(this._container, this._filmList.getElement(), Position.BEFOREEND);
 
@@ -28,76 +27,63 @@ class PageController {
 
     const filmsListElement = this._filmList.getElement().querySelector(`.films-list`);
 
-    cardsList.render(DEFAULT_CARD_SHOW);
+    this._renderCards(this._cards, FILMLIST_CARD_COUNT);
 
     filmsListExtraElements.forEach((item) => {
-      this._renderCardInCharts(this._copyCards, item, CARD_COUNT_CATEGORY);
+      this._renderCardInCharts(this._copyCards, item, CATEGORY_CARD_COUNT);
     });
 
     renderComponent(filmsListElement, this._buttonShowMore.getElement(), Position.BEFOREEND);
 
     const onLoadClick = () => {
-      cardsList.render(CARDS_COUNT_ON_CLICK);
+      this._renderCards(this._cards, FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT);
     };
 
     this._buttonShowMore.getElement().addEventListener(`click`, onLoadClick);
   }
 
 
-  _renderFilmCard(container, filmCardMock) {
-    const cardComponent = new Card(filmCardMock);
+  _renderFilmCard(container, filmCard) {
+    const cardComponent = new Card(filmCard);
 
     renderComponent(container, cardComponent.getElement(), Position.BEFOREEND);
 
     const clickCardHandler = () => {
-      this._renderPopupCard(this._copyCards, this._container, 1);
+      this._renderPopupCard(this._copyCards, this._container);
     };
 
     cardComponent.getElement().addEventListener(`click`, clickCardHandler);
   }
 
 
-  _renderCards(arrayFilms) {
+  _renderCards(films, count) {
     const filmsContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
+    let cards = films;
 
-    let cardsShow = 0;
-    let cards = arrayFilms;
+    if (count >= cards.length) {
+      count = cards.length;
+      removeComponent(this._buttonShowMore.getElement());
+      this._buttonShowMore.removeElement();
+    }
 
-    return {
-      render: (count) => {
-        if (count >= cards.length) {
-          count = cards.length;
-          removeComponent(this._buttonShowMore.getElement());
-          this._buttonShowMore.removeElement();
-        }
+    let clippedCards = cards.splice(0, count);
 
-        let arraySplice = cards.splice(0, count);
-
-        arraySplice.forEach((item) => this._renderFilmCard(filmsContainerElement, item));
-        cardsShow += count;
-      },
-
-      getVisible: () => cardsShow,
-
-      getLength: () => cards.length,
-
-      getAll: () => cards
-    };
+    clippedCards.forEach((item) => this._renderFilmCard(filmsContainerElement, item));
   }
 
 
   _renderCardInCharts(cards, container, count) {
-    const arraySplice = cards.splice(0, count);
+    const clippedCards = cards.splice(0, count);
 
-    arraySplice.forEach((item) => this._renderFilmCard(container, item));
+    clippedCards.forEach((item) => this._renderFilmCard(container, item));
   }
 
 
-  _getPopupCard(container, filmCardMock) {
-    const popupCard = new Popup(filmCardMock);
+  _getPopupCard(container, filmCard) {
+    const popupCard = new Popup(filmCard);
     const commentTextarea = popupCard.getElement().querySelector(`.film-details__comment-input`);
 
-    const removePopup = () => {
+    const removeCardDetails = () => {
       removeComponent(popupCard.getElement());
       popupCard.removeElement();
       document.removeEventListener(`keydown`, pressEscPopupHandler);
@@ -105,7 +91,7 @@ class PageController {
 
     const pressEscPopupHandler = (evt) => {
       if (evt.keyCode === ESC_KEY) {
-        removePopup();
+        removeCardDetails();
       }
     };
 
@@ -118,15 +104,15 @@ class PageController {
     });
 
     renderComponent(container, popupCard.getElement(), Position.BEFOREEND);
-    popupCard.getElement().querySelector(`.film-details__close`).addEventListener(`click`, removePopup);
+    popupCard.getElement().querySelector(`.film-details__close`).addEventListener(`click`, removeCardDetails);
     document.addEventListener(`keydown`, pressEscPopupHandler);
   }
 
 
-  _renderPopupCard(cards, container, count) {
-    const arraySplice = cards.splice(0, count);
+  _renderPopupCard(cards, container) {
+    const clippedCards = cards.splice(0, 1);
 
-    arraySplice.forEach((item) => this._getPopupCard(container, item.popup));
+    clippedCards.forEach((item) => this._getPopupCard(container, item.popup));
   }
 }
 
