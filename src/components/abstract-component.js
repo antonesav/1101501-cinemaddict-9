@@ -1,4 +1,4 @@
-import {createElement} from "../util";
+import {createElement, removeComponent} from "../util";
 
 class AbstractComponent {
   constructor() {
@@ -14,6 +14,7 @@ class AbstractComponent {
   }
 
   removeElement() {
+    removeComponent(this._element);
     this._element = null;
   }
 

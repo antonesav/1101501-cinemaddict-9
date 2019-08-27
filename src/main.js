@@ -1,6 +1,5 @@
 import Menu from "./components/menu";
 import Search from "./components/search";
-import Sort from "./components/sort";
 import User from "./components/user";
 import Message from "./components/films-list-empty";
 import {mockCards} from "./data";
@@ -16,7 +15,7 @@ footerElement.textContent = `${mockCards().length} movies inside`;
 const pageController = new PageController(mainElement, mockCards());
 
 renderComponent(mainElement, new Menu(mockCards()).getElement(), Position.BEFOREEND);
-renderComponent(mainElement, new Sort().getElement(), Position.BEFOREEND);
+// renderComponent(mainElement, new Sort().getElement(), Position.BEFOREEND);
 pageController.init();
 renderComponent(mainElement, new Message().getElement(), Position.BEFOREEND);
 renderComponent(headerElement, new Search().getElement(), Position.BEFOREEND);

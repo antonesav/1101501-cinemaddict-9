@@ -1,9 +1,10 @@
-import {removeComponent, renderComponent} from "./util";
+import {renderComponent} from "./util";
 import {Position} from "./util";
 import Card from "./components/card";
 import Button from "./components/button";
 import FilmList from "./components/films-list";
 import Popup from "./components/details";
+import Sort from "./components/sort";
 import {ESC_KEY} from "./util";
 
 const FILMLIST_CARD_COUNT = 5;
@@ -14,12 +15,17 @@ class PageController {
   constructor(mainContainer, cards) {
     this._container = mainContainer;
     this._cards = cards;
+    this._copyCards = cards.slice();
+    this._cardsShownInList = 0;
+    this._cardsShownInCategory = 0;
     this._buttonShowMore = new Button();
     this._filmList = new FilmList();
-    this._copyCards = cards.slice();
+    this._sort = new Sort();
   }
 
   init() {
+
+    renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
 
     renderComponent(this._container, this._filmList.getElement(), Position.BEFOREEND);
 
@@ -30,7 +36,7 @@ class PageController {
     this._renderCards(this._cards, FILMLIST_CARD_COUNT);
 
     filmsListExtraElements.forEach((item) => {
-      this._renderCardInCharts(this._copyCards, item, CATEGORY_CARD_COUNT);
+      this._renderCardInCharts(this._cards, item, CATEGORY_CARD_COUNT);
     });
 
     renderComponent(filmsListElement, this._buttonShowMore.getElement(), Position.BEFOREEND);
@@ -40,6 +46,8 @@ class PageController {
     };
 
     this._buttonShowMore.getElement().addEventListener(`click`, onLoadClick);
+
+    this._sort.getElement().addEventListener(`click`, (evt) => this._sortLinkClickHandler(evt));
   }
 
 
@@ -49,7 +57,7 @@ class PageController {
     renderComponent(container, cardComponent.getElement(), Position.BEFOREEND);
 
     const clickCardHandler = () => {
-      this._renderPopupCard(this._copyCards, this._container);
+      this._renderPopupCard(filmCard, this._container);
     };
 
     cardComponent.getElement().addEventListener(`click`, clickCardHandler);
@@ -58,24 +66,23 @@ class PageController {
 
   _renderCards(films, count) {
     const filmsContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
-    let cards = films;
 
-    if (count >= cards.length) {
-      count = cards.length;
-      removeComponent(this._buttonShowMore.getElement());
+    if (count >= (films.length - this._cardsShownInList)) {
+      count = films.length;
       this._buttonShowMore.removeElement();
     }
 
-    let clippedCards = cards.splice(0, count);
-
+    const clippedCards = films.slice(this._cardsShownInList, (this._cardsShownInList + count));
     clippedCards.forEach((item) => this._renderFilmCard(filmsContainerElement, item));
+    this._cardsShownInList += count;
   }
 
 
   _renderCardInCharts(cards, container, count) {
-    const clippedCards = cards.splice(0, count);
+    const clippedCards = cards.slice(this._cardsShownInCategory, (this._cardsShownInCategory + count));
 
     clippedCards.forEach((item) => this._renderFilmCard(container, item));
+    this._cardsShownInCategory += count;
   }
 
 
@@ -84,7 +91,6 @@ class PageController {
     const commentTextarea = popupCard.getElement().querySelector(`.film-details__comment-input`);
 
     const removeCardDetails = () => {
-      removeComponent(popupCard.getElement());
       popupCard.removeElement();
       document.removeEventListener(`keydown`, pressEscPopupHandler);
     };
@@ -110,9 +116,39 @@ class PageController {
 
 
   _renderPopupCard(cards, container) {
-    const clippedCards = cards.splice(0, 1);
+    this._getPopupCard(container, cards.popup);
+  }
 
-    clippedCards.forEach((item) => this._getPopupCard(container, item.popup));
+
+  _sortLinkClickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === `A`) {
+      const filmListContainer = this._filmList.getElement().querySelector(`.films-list__container`);
+      filmListContainer.innerHTML = ``;
+
+      const renderSortCards = (cards) => {
+        cards.forEach((item, index) => {
+          if (index < this._cardsShownInList) {
+            this._renderFilmCard(filmListContainer, item);
+          }
+        });
+      };
+
+      switch (evt.target.dataset.sortType) {
+        case `date`:
+          let sortByDateCards = this._cards.sort((a, b) => a.year - b.year);
+          renderSortCards(sortByDateCards);
+          break;
+        case `rating`:
+          let sortByRatingCards = this._cards.sort((a, b) => b.rating - a.rating);
+          renderSortCards(sortByRatingCards);
+          break;
+        case `default`:
+          this._cards = this._copyCards.slice();
+          renderSortCards(this._cards);
+          break;
+      }
+    }
   }
 }
 

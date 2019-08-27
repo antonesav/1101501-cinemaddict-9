@@ -7,7 +7,6 @@ import {getRandomDuration} from "./util";
 import {generateDescription} from "./util";
 import {getRandomList} from "./util";
 import {getRandomRealise} from "./util";
-// import {getRandomGenres} from "./util";
 
 const CARD_COUNT = 20;
 const COMMENT_COUNT = 4;
