@@ -64,25 +64,29 @@ class PageController {
   }
 
 
-  _renderCards(films, count) {
+  _renderCards(films, cardsQuantity) {
     const filmsContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
+    const residualCards = films.length - this._cardsShownInList;
 
-    if (count >= (films.length - this._cardsShownInList)) {
-      count = films.length;
+    if (cardsQuantity >= residualCards) {
+      cardsQuantity = films.length;
       this._buttonShowMore.removeElement();
     }
 
-    const clippedCards = films.slice(this._cardsShownInList, (this._cardsShownInList + count));
+    const addedCardsQuantity = this._cardsShownInList + cardsQuantity;
+    const clippedCards = films.slice(this._cardsShownInList, addedCardsQuantity);
+
     clippedCards.forEach((item) => this._renderFilmCard(filmsContainerElement, item));
-    this._cardsShownInList += count;
+    this._cardsShownInList += cardsQuantity;
   }
 
 
-  _renderCardInCharts(cards, container, count) {
-    const clippedCards = cards.slice(this._cardsShownInCategory, (this._cardsShownInCategory + count));
+  _renderCardInCharts(cards, container, cardsQuantity) {
+    const addedCardsQuantity = this._cardsShownInCategory + cardsQuantity;
+    const clippedCards = cards.slice(this._cardsShownInCategory, addedCardsQuantity);
 
     clippedCards.forEach((item) => this._renderFilmCard(container, item));
-    this._cardsShownInCategory += count;
+    this._cardsShownInCategory += cardsQuantity;
   }
 
 
