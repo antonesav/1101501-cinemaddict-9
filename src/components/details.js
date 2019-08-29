@@ -1,5 +1,5 @@
-import {createElement} from "../util";
 import {renderItemQuantity} from "../util";
+import AbstractComponent from "./abstract-component";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -32,8 +32,9 @@ const getComment = (comments) => {
   });
 };
 
-class Popup {
+class Popup extends AbstractComponent {
   constructor({title, original, director, writers, actors, rating, release, duration, country, genres, poster, description, comments, age}) {
+    super();
     this._title = title;
     this._original = original;
     this._director = director;
@@ -48,19 +49,6 @@ class Popup {
     this._description = description;
     this._comments = comments;
     this._age = age;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

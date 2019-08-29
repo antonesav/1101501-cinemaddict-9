@@ -1,27 +1,15 @@
-import {createElement} from "../util";
+import AbstractComponent from "./abstract-component";
 
-class Sort {
+class Sort extends AbstractComponent {
   constructor() {
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    super();
   }
 
   getTemplate() {
     return `<ul class="sort">
-    <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
-    <li><a href="#" class="sort__button">Sort by date</a></li>
-    <li><a href="#" class="sort__button">Sort by rating</a></li>
+    <li><a href="#" data-sort-type="default" class="sort__button sort__button--active">Sort by default</a></li>
+    <li><a href="#" data-sort-type="date" class="sort__button">Sort by date</a></li>
+    <li><a href="#" data-sort-type="rating" class="sort__button">Sort by rating</a></li>
   </ul>`;
   }
 }
