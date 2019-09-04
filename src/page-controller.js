@@ -3,9 +3,10 @@ import {Position} from "./util";
 import Card from "./components/card";
 import Button from "./components/button";
 import FilmList from "./components/films-list";
-import Popup from "./components/details";
 import Sort from "./components/sort";
-import {ESC_KEY} from "./util";
+import MovieController from "./movie-controller";
+import Menu from "./components/menu";
+import {mockCards} from "./data";
 
 const FILMLIST_CARD_COUNT = 5;
 const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
@@ -21,9 +22,14 @@ class PageController {
     this._buttonShowMore = new Button();
     this._filmList = new FilmList();
     this._sort = new Sort();
+    this._menu = new Menu(this._cards);
+    this._filmListContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
+    this._onDataChange = this._onDataChange.bind(this);
   }
 
   init() {
+
+    renderComponent(this._container, this._menu.getElement(), Position.BEFOREEND);
 
     renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
 
@@ -56,8 +62,33 @@ class PageController {
 
     renderComponent(container, cardComponent.getElement(), Position.BEFOREEND);
 
-    const clickCardHandler = () => {
-      this._renderPopupCard(filmCard, this._container);
+    const onControlButtonClick = (evt) => {
+      evt.preventDefault();
+      evt.target.classList.toggle(`film-card__controls-item--active`);
+
+      const getNewData = () => {
+        switch (evt.target.dataset.action) {
+          case `watchlist`:
+            return Object.assign({}, filmCard, {isWatchlist: !filmCard.isWatchlist});
+          case `watched`:
+            return Object.assign({}, filmCard, {isWatched: !filmCard.isWatched});
+          case `favorite`:
+            return Object.assign({}, filmCard, {isFavorite: !filmCard.isFavorite});
+        }
+        return null;
+      };
+
+      this._onDataChange(getNewData(), filmCard);
+    };
+
+    cardComponent.getElement().querySelectorAll(`.film-card__controls-item`).forEach((button) => {
+      button.addEventListener(`click`, onControlButtonClick);
+    });
+
+    const clickCardHandler = (evt) => {
+      if (!evt.target.classList.contains(`film-card__controls-item`)) {
+        this._renderPopupCard(filmCard, this._container);
+      }
     };
 
     cardComponent.getElement().addEventListener(`click`, clickCardHandler);
@@ -65,7 +96,6 @@ class PageController {
 
 
   _renderCards(films, cardsQuantity) {
-    const filmsContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
     const residualCards = films.length - this._cardsShownInList;
 
     if (cardsQuantity >= residualCards) {
@@ -76,7 +106,7 @@ class PageController {
     const addedCardsQuantity = this._cardsShownInList + cardsQuantity;
     const clippedCards = films.slice(this._cardsShownInList, addedCardsQuantity);
 
-    clippedCards.forEach((item) => this._renderFilmCard(filmsContainerElement, item));
+    clippedCards.forEach((item) => this._renderFilmCard(this._filmListContainerElement, item));
     this._cardsShownInList += cardsQuantity;
   }
 
@@ -90,66 +120,46 @@ class PageController {
   }
 
 
-  _getPopupCard(container, filmCard) {
-    const popupCard = new Popup(filmCard);
-    const commentTextarea = popupCard.getElement().querySelector(`.film-details__comment-input`);
-
-    const removeCardDetails = () => {
-      popupCard.removeElement();
-      document.removeEventListener(`keydown`, pressEscPopupHandler);
-    };
-
-    const pressEscPopupHandler = (evt) => {
-      if (evt.keyCode === ESC_KEY) {
-        removeCardDetails();
-      }
-    };
-
-    commentTextarea.addEventListener(`focus`, () => {
-      document.removeEventListener(`keydown`, pressEscPopupHandler);
-    });
-
-    commentTextarea.addEventListener(`blur`, () => {
-      document.addEventListener(`keydown`, pressEscPopupHandler);
-    });
-
-    renderComponent(container, popupCard.getElement(), Position.BEFOREEND);
-    popupCard.getElement().querySelector(`.film-details__close`).addEventListener(`click`, removeCardDetails);
-    document.addEventListener(`keydown`, pressEscPopupHandler);
+  _onDataChange(newData, oldData) {
+    this._cards[this._cards.findIndex((it) => it === oldData)] = newData;
+    this._copyCards[this._copyCards.findIndex((it) => it === oldData)] = newData;
+    this._reRenderCards(this._cards, this._filmListContainerElement);
+    this._menu.removeElement();
+    renderComponent(this._container, this._menu.getElement(), Position.AFTERBEGIN);
   }
 
 
-  _renderPopupCard(cards, container) {
-    this._getPopupCard(container, cards.popup);
+  _renderPopupCard(card, container) {
+    const popupCard = new MovieController(container, card, this._onDataChange);
+    popupCard.init();
+  }
+
+  _reRenderCards(cards, container) {
+    this._filmListContainerElement.innerHTML = ``;
+    cards.forEach((item, index) => {
+      if (index < this._cardsShownInList) {
+        this._renderFilmCard(container, item);
+      }
+    });
   }
 
 
   _sortLinkClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === `A`) {
-      const filmListContainer = this._filmList.getElement().querySelector(`.films-list__container`);
-      filmListContainer.innerHTML = ``;
-
-      const renderSortCards = (cards) => {
-        cards.forEach((item, index) => {
-          if (index < this._cardsShownInList) {
-            this._renderFilmCard(filmListContainer, item);
-          }
-        });
-      };
 
       switch (evt.target.dataset.sortType) {
         case `date`:
           let sortByDateCards = this._cards.sort((a, b) => a.year - b.year);
-          renderSortCards(sortByDateCards);
+          this._reRenderCards(sortByDateCards, this._filmListContainerElement);
           break;
         case `rating`:
           let sortByRatingCards = this._cards.sort((a, b) => b.rating - a.rating);
-          renderSortCards(sortByRatingCards);
+          this._reRenderCards(sortByRatingCards, this._filmListContainerElement);
           break;
         case `default`:
           this._cards = this._copyCards.slice();
-          renderSortCards(this._cards);
+          this._reRenderCards(this._cards, this._filmListContainerElement);
           break;
       }
     }

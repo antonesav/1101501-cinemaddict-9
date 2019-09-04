@@ -1,5 +1,6 @@
-import {renderItemQuantity} from "../util";
+import {removeComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
+import DetailsRating from "./details-rating";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -33,7 +34,10 @@ const getComment = (comments) => {
 };
 
 class Popup extends AbstractComponent {
-  constructor({title, original, director, writers, actors, rating, release, duration, country, genres, poster, description, comments, age}) {
+  constructor({title, original, director, writers, actors,
+    rating, userRating, release, duration, country, genres, poster,
+    description, isWatchlist, isWatched, isFavorite,
+    comments, age}) {
     super();
     this._title = title;
     this._original = original;
@@ -41,15 +45,57 @@ class Popup extends AbstractComponent {
     this._writers = writers;
     this._actors = actors;
     this._rating = rating;
+    this._userRating = userRating;
     this._release = release;
     this._duration = duration;
     this._country = country;
     this._genres = genres;
     this._poster = poster;
     this._description = description;
+    this._isWatchlist = isWatchlist;
+    this._isWatched = isWatched;
+    this._isFavorite = isFavorite;
     this._comments = comments;
     this._age = age;
+    this._ratingElement = new DetailsRating(this._poster);
+    this._changeRatingHandler = this._changeRatingHandler.bind(this);
+    this._onChangeWatchedStatus = this._onChangeWatchedStatus.bind(this);
+
+    this._subscribeEvents();
   }
+
+  _subscribeEvents() {
+    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._onChangeWatchedStatus);
+    this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`).addEventListener(`change`, function (evt) {
+      console.log(`y`)
+    });
+    // console.log(this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`))
+    if(this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`)) {
+      console.log(`hi`)
+    }
+  }
+
+  _onChangeWatchedStatus() {
+    const filmDetailsMiddle = this._element.querySelector(`.form-details__middle-container`);
+
+    if (filmDetailsMiddle) {
+      removeComponent(filmDetailsMiddle);
+    } else {
+      this._element.querySelector(`.form-details__top-container`).insertAdjacentHTML(`afterend`, this._ratingElement.getTemplate());
+    }
+  }
+
+  _changeRatingHandler(evt) {
+    this._userRating = evt.target.value;
+    console.log(evt.target);
+    // this._renderUserRating(this._userRating);
+  }
+
+
+  // _renderUserRating(valueRating) {
+  //   this.getElement().querySelector(`.film-details__rating`).insertAdjacentHTML(`beforeend`, `<p class="film-details__user-rating">Your rate ${valueRating}</p>`);
+  // }
+
 
   getTemplate() {
     return `<section class="film-details">
@@ -74,6 +120,7 @@ class Popup extends AbstractComponent {
   
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${this._rating}</p>
+                
               </div>
             </div>
   
@@ -114,16 +161,18 @@ class Popup extends AbstractComponent {
         </div>
   
         <section class="film-details__controls">
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${this._isWatchlist ? `checked` : ``}>
           <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
   
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${this._isWatched ? `checked` : ``}>
           <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
   
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${this._isFavorite ? `checked` : ``}>
           <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
         </section>
       </div>
+    
+    ${this._isWatched && !this._userRating ? this._ratingElement.getTemplate() : ``}
   
       <div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
