@@ -1,4 +1,4 @@
-import {removeComponent, renderItemQuantity} from "../util";
+import {Position, removeComponent, renderComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
 import DetailsRating from "./details-rating";
 
@@ -19,7 +19,7 @@ const getComment = (comments) => {
     return `
     <li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${item.avatar}" width="55" height="55" alt="emoji">
+        <img src="${item.avatar}" width="55" height="55" alt="emoji">
       </span>
       <div>
         <p class="film-details__comment-text">${item.text}</p>
@@ -57,44 +57,124 @@ class Popup extends AbstractComponent {
     this._isFavorite = isFavorite;
     this._comments = comments;
     this._age = age;
-    this._ratingElement = new DetailsRating(this._poster);
+    this._ratingElement = new DetailsRating(this._poster, this._title);
     this._changeRatingHandler = this._changeRatingHandler.bind(this);
-    this._onChangeWatchedStatus = this._onChangeWatchedStatus.bind(this);
+    this._changeWatchedStatusHandler = this._changeWatchedStatusHandler.bind(this);
+    this._removeUserRatingElement = this._removeUserRatingElement.bind(this);
+    this._changeEmojiHandler = this._changeEmojiHandler.bind(this);
+    this._addCommentEnterKey = this._addCommentEnterKey.bind(this);
+    this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
 
     this._subscribeEvents();
   }
 
+
   _subscribeEvents() {
-    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._onChangeWatchedStatus);
-    this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`).addEventListener(`change`, function (evt) {
-      console.log(`y`)
-    });
-    // console.log(this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`))
-    if(this._ratingElement.getElement().querySelector(`.film-details__user-rating-score`)) {
-      console.log(`hi`)
+    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._changeWatchedStatusHandler);
+
+    if (this.getElement().querySelector(`.film-details__user-rating-score`)) {
+      this._changedRating();
     }
+
+    this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._addCommentEnterKey);
+
+    this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._changeEmojiHandler);
+
+    this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
+      button.addEventListener(`click`, this._commentDeleteHandler);
+    });
   }
 
-  _onChangeWatchedStatus() {
-    const filmDetailsMiddle = this._element.querySelector(`.form-details__middle-container`);
+
+  _changedRating() {
+    this.getElement().querySelector(`.film-details__user-rating-score`).addEventListener(`change`, this._changeRatingHandler);
+  }
+
+
+  _changeWatchedStatusHandler() {
+    const filmDetailsMiddle = this.getElement().querySelector(`.form-details__middle-container`);
 
     if (filmDetailsMiddle) {
       removeComponent(filmDetailsMiddle);
+      this._removeUserRatingElement();
     } else {
       this._element.querySelector(`.form-details__top-container`).insertAdjacentHTML(`afterend`, this._ratingElement.getTemplate());
+      this._changedRating();
+      this._resetUserRating();
     }
   }
 
+
   _changeRatingHandler(evt) {
     this._userRating = evt.target.value;
-    console.log(evt.target);
-    // this._renderUserRating(this._userRating);
+    this._removeUserRatingElement();
+
+    this.getElement().querySelector(`.film-details__rating`).
+    insertAdjacentHTML(`beforeend`, `<p class="film-details__user-rating">Your rate ${this._userRating}</p>`);
   }
 
 
-  // _renderUserRating(valueRating) {
-  //   this.getElement().querySelector(`.film-details__rating`).insertAdjacentHTML(`beforeend`, `<p class="film-details__user-rating">Your rate ${valueRating}</p>`);
-  // }
+  _resetUserRating() {
+    this.getElement().querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._removeUserRatingElement);
+  }
+
+
+  _removeUserRatingElement() {
+    const userRatingElement = this.getElement().querySelector(`.film-details__user-rating`);
+
+    if (userRatingElement) {
+      removeComponent(userRatingElement);
+    }
+  }
+
+  _changeEmojiHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === `IMG`) {
+      const parentTarget = evt.target.parentElement.htmlFor;
+      evt.currentTarget.querySelector(`#${parentTarget}`).checked = true;
+
+      const labelEmojiElement = document.querySelector(`.film-details__add-emoji-label`);
+      labelEmojiElement.innerHTML = `<img src="${evt.target.src}" width="55" height="55" alt="emoji">`;
+    }
+  }
+
+
+  _removeCommentElements() {
+    const quantityCommentElement = this.getElement().querySelector(`.film-details__comments-title`);
+    const commentsContainer = this.getElement().querySelector(`.film-details__comments-list`);
+
+    quantityCommentElement.remove();
+    renderComponent(this.getElement().querySelector(`.film-details__comments-wrap`), `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._comments.length}</span></h3>`, Position.BEFOREBEGIN);
+    commentsContainer.remove();
+  }
+
+  _commentDeleteHandler(evt) {
+    evt.preventDefault();
+    evt.target.parentNode.parentNode.parentElement.remove();
+  }
+
+
+  _addCommentEnterKey(evt) {
+    if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
+      return;
+    }
+
+    evt.preventDefault();
+    if (this.getElement().querySelector(`.film-details__emoji-list input:checked`) && evt.target.value) {
+      const avatarElement = this.getElement().querySelector(`.film-details__add-emoji-label`).firstElementChild;
+      this._comments.push({
+        avatar: avatarElement.src,
+        date: 0,
+        name: `Петька`,
+        text: evt.target.value
+      });
+
+      this._removeCommentElements();
+      renderComponent(this.getElement().querySelector(`.film-details__new-comment`), `<ul class="film-details__comments-list">
+          ${getComment(this._comments)}
+          </ul>`, Position.BEFOREBEGIN);
+    }
+  }
 
 
   getTemplate() {
@@ -120,7 +200,6 @@ class Popup extends AbstractComponent {
   
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${this._rating}</p>
-                
               </div>
             </div>
   
@@ -186,7 +265,7 @@ class Popup extends AbstractComponent {
             <div for="add-emoji" class="film-details__add-emoji-label"></div>
   
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" minlength="5"></textarea>
             </label>
   
             <div class="film-details__emoji-list">

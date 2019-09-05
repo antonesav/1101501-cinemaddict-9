@@ -6,7 +6,6 @@ import FilmList from "./components/films-list";
 import Sort from "./components/sort";
 import MovieController from "./movie-controller";
 import Menu from "./components/menu";
-import {mockCards} from "./data";
 
 const FILMLIST_CARD_COUNT = 5;
 const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
@@ -24,7 +23,7 @@ class PageController {
     this._sort = new Sort();
     this._menu = new Menu(this._cards);
     this._filmListContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
-    this._onDataChange = this._onDataChange.bind(this);
+    this._dataChangeHandler = this._dataChangeHandler.bind(this);
   }
 
   init() {
@@ -78,7 +77,7 @@ class PageController {
         return null;
       };
 
-      this._onDataChange(getNewData(), filmCard);
+      this._dataChangeHandler(getNewData(), filmCard);
     };
 
     cardComponent.getElement().querySelectorAll(`.film-card__controls-item`).forEach((button) => {
@@ -120,7 +119,7 @@ class PageController {
   }
 
 
-  _onDataChange(newData, oldData) {
+  _dataChangeHandler(newData, oldData) {
     this._cards[this._cards.findIndex((it) => it === oldData)] = newData;
     this._copyCards[this._copyCards.findIndex((it) => it === oldData)] = newData;
     this._reRenderCards(this._cards, this._filmListContainerElement);
@@ -130,7 +129,7 @@ class PageController {
 
 
   _renderPopupCard(card, container) {
-    const popupCard = new MovieController(container, card, this._onDataChange);
+    const popupCard = new MovieController(container, card, this._dataChangeHandler);
     popupCard.init();
   }
 

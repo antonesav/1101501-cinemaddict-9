@@ -24,7 +24,7 @@ const dataMock = {
   writers: [`David Lynch`, `Donald Richie`, `Martin Scorsese`, `Hannah Patterson`, `Joel and Ethan Coen`, `Spencer Moon`, `Steven Soderbergh`],
   actors: [`Steven Soderbergh`, `Hannah Patterson`, `David Lynch`, `Joel and Ethan Coen`, `Donald Richie`, `Spencer Moon`, `Martin Scorsese`],
   country: [`USA`, `Russia`, `Greece`, `Serbia`, `Spain`],
-  avatar: [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`, `trophy.png`],
+  avatar: [`./images/emoji/angry.png`, `./images/emoji/puke.png`, `./images/emoji/sleeping.png`, `./images/emoji/smile.png`, `./images/emoji/trophy.png`],
   age: [`0`, `8`, `10`, `12`, `16`, `18`],
 };
 

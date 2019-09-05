@@ -1,9 +1,10 @@
 import AbstractComponent from "./abstract-component";
 
 class DetailsRating extends AbstractComponent {
-  constructor(poster) {
+  constructor(poster, title) {
     super();
     this._poster = poster;
+    this._title = title;
   }
 
   getTemplate() {
@@ -19,7 +20,7 @@ class DetailsRating extends AbstractComponent {
           </div>
 
           <section class="film-details__user-rating-inner">
-            <h3 class="film-details__user-rating-title">The Great Flamarion</h3>
+            <h3 class="film-details__user-rating-title">${this._title}</h3>
 
             <p class="film-details__user-rating-feelings">How you feel it?</p>
 

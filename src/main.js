@@ -1,4 +1,3 @@
-import Menu from "./components/menu";
 import Search from "./components/search";
 import User from "./components/user";
 import Message from "./components/films-list-empty";

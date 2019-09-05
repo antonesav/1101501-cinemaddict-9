@@ -48,7 +48,7 @@ class MovieController {
       isWatched: formData.get(`watched`) === `on`,
       isFavorite: formData.get(`favorite`) === `on`,
     };
-    console.log(this._data);
+
     this._dataChangeHandler(Object.assign({}, this._data, entry), this._data);
   }
 
