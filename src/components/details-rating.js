@@ -49,7 +49,7 @@ class DetailsRating extends AbstractComponent {
               <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="8" id="rating-8">
               <label class="film-details__user-rating-label" for="rating-8">8</label>
 
-              <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="9" id="rating-9" checked>
+              <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="9" id="rating-9">
               <label class="film-details__user-rating-label" for="rating-9">9</label>
 
             </div>

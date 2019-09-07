@@ -146,21 +146,20 @@ class PageController {
   _sortLinkClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === `A`) {
+      let sortCards;
 
       switch (evt.target.dataset.sortType) {
         case `date`:
-          let sortByDateCards = this._cards.sort((a, b) => a.year - b.year);
-          this._reRenderCards(sortByDateCards, this._filmListContainerElement);
+          sortCards = this._cards.sort((a, b) => a.year - b.year);
           break;
         case `rating`:
-          let sortByRatingCards = this._cards.sort((a, b) => b.rating - a.rating);
-          this._reRenderCards(sortByRatingCards, this._filmListContainerElement);
+          sortCards = this._cards.sort((a, b) => b.rating - a.rating);
           break;
         case `default`:
-          this._cards = this._copyCards.slice();
-          this._reRenderCards(this._cards, this._filmListContainerElement);
+          sortCards = this._copyCards.slice();
           break;
       }
+      this._reRenderCards(sortCards, this._filmListContainerElement);
     }
   }
 }

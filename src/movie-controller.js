@@ -1,5 +1,5 @@
-import Popup from "./components/details";
-import {ESC_KEY, Position, renderComponent} from "./util";
+import Popup from "./components/popup";
+import {Position, renderComponent} from "./util";
 
 class MovieController {
   constructor(container, data, dataChangeHandler) {
@@ -7,13 +7,10 @@ class MovieController {
     this._data = data;
     this._popupCard = new Popup(this._data);
     this._dataChangeHandler = dataChangeHandler;
-
-    this.init();
   }
 
   init() {
     const commentTextarea = this._popupCard.getElement().querySelector(`.film-details__comment-input`);
-
     const removeCardDetails = () => {
       if (document.body.contains(this._popupCard.getElement())) {
         this._changeControlButtons();
@@ -23,7 +20,7 @@ class MovieController {
     };
 
     const pressEscPopupHandler = (evt) => {
-      if (evt.keyCode === ESC_KEY) {
+      if (evt.key === `Escape` || evt.key === `Esc`) {
         removeCardDetails();
       }
     };
@@ -36,7 +33,10 @@ class MovieController {
       document.addEventListener(`keydown`, pressEscPopupHandler);
     });
 
-    renderComponent(this._container, this._popupCard.getElement(), Position.BEFOREEND);
+    if (!document.querySelector(`.film-details`)) {
+      renderComponent(this._container, this._popupCard.getElement(), Position.BEFOREEND);
+    }
+
     this._popupCard.getElement().querySelector(`.film-details__close`).addEventListener(`click`, removeCardDetails);
     document.addEventListener(`keydown`, pressEscPopupHandler);
   }
