@@ -30,7 +30,7 @@ const getComment = (comments) => {
         </p>
       </div>
     </li>`;
-  });
+  }).join(``);
 };
 
 class Popup extends AbstractComponent {
