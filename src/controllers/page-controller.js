@@ -1,11 +1,11 @@
-import {renderComponent} from "./util";
-import {Position} from "./util";
-import Card from "./components/card";
-import Button from "./components/button";
-import FilmList from "./components/films-list";
-import Sort from "./components/sort";
+import {renderComponent} from "../util";
+import {Position} from "../util";
+import Card from "../components/card";
+import Button from "../components/button";
+import FilmList from "../components/films-list";
+import Sort from "../components/sort";
 import MovieController from "./movie-controller";
-import Menu from "./components/menu";
+import Menu from "../components/menu";
 
 const FILMLIST_CARD_COUNT = 5;
 const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
@@ -65,12 +65,14 @@ class PageController {
       evt.preventDefault();
       evt.target.classList.toggle(`film-card__controls-item--active`);
 
+      // const userRate = !filmCard.isWatched ? false : filmCard.userRating;
+
       const getNewData = () => {
         switch (evt.target.dataset.action) {
           case `watchlist`:
             return Object.assign({}, filmCard, {isWatchlist: !filmCard.isWatchlist});
           case `watched`:
-            return Object.assign({}, filmCard, {isWatched: !filmCard.isWatched});
+            return Object.assign({}, filmCard, {isWatched: !filmCard.isWatched, userRating: false});
           case `favorite`:
             return Object.assign({}, filmCard, {isFavorite: !filmCard.isFavorite});
         }

@@ -1,6 +1,6 @@
-import {Position, removeComponent, renderComponent, renderItemQuantity} from "../util";
+import {Position, renderComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
-import DetailsRating from "./details-rating";
+import Comment from "./comment";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -14,28 +14,28 @@ const getGenresQuantity = (genres) => {
   `;
 };
 
-const getComment = (comments) => {
-  return comments.map((item) => {
-    return `
-    <li class="film-details__comment">
-      <span class="film-details__comment-emoji">
-        <img src="${item.avatar}" width="55" height="55" alt="emoji">
-      </span>
-      <div>
-        <p class="film-details__comment-text">${item.text}</p>
-        <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${item.name}</span>
-          <span class="film-details__comment-day">${item.date} days ago</span>
-          <button class="film-details__comment-delete">Delete</button>
-        </p>
-      </div>
-    </li>`;
-  }).join(``);
-};
+// const getComment = (comments) => {
+//   return comments.map((item) => {
+//     return `
+//     <li class="film-details__comment">
+//       <span class="film-details__comment-emoji">
+//         <img src="${item.avatar}" width="55" height="55" alt="emoji">
+//       </span>
+//       <div>
+//         <p class="film-details__comment-text">${item.text}</p>
+//         <p class="film-details__comment-info">
+//           <span class="film-details__comment-author">${item.name}</span>
+//           <span class="film-details__comment-day">${item.date} days ago</span>
+//           <button class="film-details__comment-delete">Delete</button>
+//         </p>
+//       </div>
+//     </li>`;
+//   }).join(``);
+// };
 
 class Popup extends AbstractComponent {
   constructor({title, original, director, writers, actors,
-    rating, userRating, release, duration, country, genres, poster,
+    rating, release, duration, country, genres, poster,
     description, isWatchlist, isWatched, isFavorite,
     comments, age}) {
     super();
@@ -45,7 +45,6 @@ class Popup extends AbstractComponent {
     this._writers = writers;
     this._actors = actors;
     this._rating = rating;
-    this._userRating = userRating;
     this._release = release;
     this._duration = duration;
     this._country = country;
@@ -57,10 +56,6 @@ class Popup extends AbstractComponent {
     this._isFavorite = isFavorite;
     this._comments = comments;
     this._age = age;
-    this._ratingElement = new DetailsRating(this._poster, this._title);
-    this._changeRatingHandler = this._changeRatingHandler.bind(this);
-    this._changeWatchedStatusHandler = this._changeWatchedStatusHandler.bind(this);
-    this._removeUserRatingElement = this._removeUserRatingElement.bind(this);
     this._changeEmojiHandler = this._changeEmojiHandler.bind(this);
     this._addCommentEnterKey = this._addCommentEnterKey.bind(this);
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
@@ -70,62 +65,18 @@ class Popup extends AbstractComponent {
 
 
   _subscribeEvents() {
-    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._changeWatchedStatusHandler);
 
-    if (this.getElement().querySelector(`.film-details__user-rating-score`)) {
-      this._changedRating();
-    }
+    this._getComment(this._comments);
 
     this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._addCommentEnterKey);
 
     this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._changeEmojiHandler);
 
-    this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
-      button.addEventListener(`click`, this._commentDeleteHandler);
-    });
+    // this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
+    //   button.addEventListener(`click`, this._commentDeleteHandler);
+    // });
   }
 
-
-  _changedRating() {
-    this.getElement().querySelector(`.film-details__user-rating-score`).addEventListener(`change`, this._changeRatingHandler);
-  }
-
-
-  _changeWatchedStatusHandler() {
-    const filmDetailsMiddle = this.getElement().querySelector(`.form-details__middle-container`);
-
-    if (filmDetailsMiddle) {
-      removeComponent(filmDetailsMiddle);
-      this._removeUserRatingElement();
-    } else {
-      this._element.querySelector(`.form-details__top-container`).insertAdjacentHTML(`afterend`, this._ratingElement.getTemplate());
-      this._changedRating();
-      this._resetUserRating();
-    }
-  }
-
-
-  _changeRatingHandler(evt) {
-    this._userRating = evt.target.value;
-    this._removeUserRatingElement();
-
-    this.getElement().querySelector(`.film-details__rating`).
-    insertAdjacentHTML(`beforeend`, `<p class="film-details__user-rating">Your rate ${this._userRating}</p>`);
-  }
-
-
-  _resetUserRating() {
-    this.getElement().querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._removeUserRatingElement);
-  }
-
-
-  _removeUserRatingElement() {
-    const userRatingElement = this.getElement().querySelector(`.film-details__user-rating`);
-
-    if (userRatingElement) {
-      removeComponent(userRatingElement);
-    }
-  }
 
   _changeEmojiHandler(evt) {
     evt.preventDefault();
@@ -153,6 +104,13 @@ class Popup extends AbstractComponent {
     evt.target.parentNode.parentNode.parentElement.remove();
   }
 
+  _getComment(comments) {
+    comments.forEach((item) => {
+      const comment = new Comment(item);
+      renderComponent(this.getElement().querySelector(`.film-details__new-comment`), `<ul class="film-details__comments-list">${comment.getElement()}</ul>`, Position.BEFOREBEGIN);
+    });
+  }
+
 
   _addCommentEnterKey(evt) {
     if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
@@ -171,7 +129,7 @@ class Popup extends AbstractComponent {
 
       this._removeCommentElements();
       renderComponent(this.getElement().querySelector(`.film-details__new-comment`), `<ul class="film-details__comments-list">
-          ${getComment(this._comments)}
+          ${this._getComment(this._comments)}
           </ul>`, Position.BEFOREBEGIN);
     }
   }
@@ -250,15 +208,13 @@ class Popup extends AbstractComponent {
           <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
         </section>
       </div>
-    
-    ${this._isWatched && !this._userRating ? this._ratingElement.getTemplate() : ``}
   
       <div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._comments.length}</span></h3>
   
           <ul class="film-details__comments-list">
-          ${getComment(this._comments)}
+          
           </ul>
   
           <div class="film-details__new-comment">
