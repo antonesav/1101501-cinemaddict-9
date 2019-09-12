@@ -6,12 +6,6 @@ const stats = [
   {title: `Favorites`, count: 0},
 ];
 
-const filterCount = {
-  watchlist: 0,
-  history: 0,
-  favorites: 0,
-};
-
 const renderFilter = (filter) => {
   const {title, count} = filter;
   return `<a href="#${title}" class="main-navigation__item">${title} <span class="main-navigation__item-count">${count}</span></a>`;
@@ -20,11 +14,17 @@ const renderFilter = (filter) => {
 const getFilters = (markup) => markup.map((filter) => renderFilter(filter));
 
 const fillFilters = (cards) => {
+  const filterCount = {
+    watchlist: 0,
+    history: 0,
+    favorites: 0,
+  };
   cards.forEach((item) => {
     filterCount.watchlist += item.isWatchlist ? 1 : 0;
     filterCount.history += item.isWatched ? 1 : 0;
     filterCount.favorites += item.isFavorite ? 1 : 0;
   });
+
   Object.keys(filterCount).forEach((item, index) => {
     stats[index].count = filterCount[item];
   });

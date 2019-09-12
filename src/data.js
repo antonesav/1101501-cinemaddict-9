@@ -24,7 +24,7 @@ const dataMock = {
   writers: [`David Lynch`, `Donald Richie`, `Martin Scorsese`, `Hannah Patterson`, `Joel and Ethan Coen`, `Spencer Moon`, `Steven Soderbergh`],
   actors: [`Steven Soderbergh`, `Hannah Patterson`, `David Lynch`, `Joel and Ethan Coen`, `Donald Richie`, `Spencer Moon`, `Martin Scorsese`],
   country: [`USA`, `Russia`, `Greece`, `Serbia`, `Spain`],
-  avatar: [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`, `trophy.png`],
+  avatar: [`./images/emoji/angry.png`, `./images/emoji/puke.png`, `./images/emoji/sleeping.png`, `./images/emoji/smile.png`, `./images/emoji/trophy.png`],
   age: [`0`, `8`, `10`, `12`, `16`, `18`],
 };
 
@@ -42,6 +42,7 @@ const getComments = (count) => {
 export const getCard = () => ({
   title: getRandomValue(dataMock.titles),
   rating: getRandomRating(10),
+  userRating: false,
   year: getRandomNumberInRange(1900, 2019),
   duration: getRandomDuration(),
   genre: getRandomValue(dataMock.genres),
@@ -51,22 +52,15 @@ export const getCard = () => ({
   isWatchlist: getRandomBoolean(),
   isWatched: getRandomBoolean(),
   isFavorite: getRandomBoolean(),
-  popup: {
-    title: getRandomValue(dataMock.titles),
-    original: getRandomValue(dataMock.titles),
-    director: getRandomValue(dataMock.directors),
-    writers: getRandomList(dataMock.writers),
-    actors: getRandomList(dataMock.actors),
-    rating: getRandomRating(10),
-    release: getRandomRealise(),
-    duration: getRandomDuration(),
-    country: getRandomValue(dataMock.country),
-    genres: getRandomList(dataMock.genres),
-    poster: getRandomValue(dataMock.posters),
-    description: generateDescription(dataMock.description),
-    comments: getComments(COMMENT_COUNT),
-    age: getRandomValue(dataMock.age),
-  },
+  original: getRandomValue(dataMock.titles),
+  director: getRandomValue(dataMock.directors),
+  writers: getRandomList(dataMock.writers),
+  actors: getRandomList(dataMock.actors),
+  release: getRandomRealise(),
+  country: getRandomValue(dataMock.country),
+  genres: getRandomList(dataMock.genres),
+  comments: getComments(COMMENT_COUNT),
+  age: getRandomValue(dataMock.age),
 });
 
 export const mockCards = () => {

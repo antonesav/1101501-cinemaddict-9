@@ -30,9 +30,9 @@ class Card extends AbstractComponent {
         <p class="film-card__description">${this._description}</p>
         <a class="film-card__comments">${this._commentsQuantity} ${renderItemQuantity(this._commentsQuantity, `comment`)}</a>
         <form class="film-card__controls">
-          <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${this._isWatchlist ? `film-card__controls-item--active` : ``}">Add to watchlist</button>
-          <button class="film-card__controls-item button film-card__controls-item--mark-as-watched  ${this._isWatched ? `film-card__controls-item--active` : ``}">Mark as watched</button>
-          <button class="film-card__controls-item button film-card__controls-item--favorite ${this._isFavorite ? `film-card__controls-item--active` : ``}">Mark as favorite</button>
+          <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${this._isWatchlist ? `film-card__controls-item--active` : ``}" data-action="watchlist">Add to watchlist</button>
+          <button class="film-card__controls-item button film-card__controls-item--mark-as-watched  ${this._isWatched ? `film-card__controls-item--active` : ``}" data-action="watched">Mark as watched</button>
+          <button class="film-card__controls-item button film-card__controls-item--favorite ${this._isFavorite ? `film-card__controls-item--active` : ``}" data-action="favorite">Mark as favorite</button>
         </form>
       </article>`;
   }
