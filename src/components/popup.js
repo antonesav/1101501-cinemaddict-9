@@ -1,6 +1,7 @@
 import {Position, renderComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
 import Comment from "./comment";
+import moment from "moment";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -14,24 +15,6 @@ const getGenresQuantity = (genres) => {
   `;
 };
 
-// const getComment = (comments) => {
-//   return comments.map((item) => {
-//     return `
-//     <li class="film-details__comment">
-//       <span class="film-details__comment-emoji">
-//         <img src="${item.avatar}" width="55" height="55" alt="emoji">
-//       </span>
-//       <div>
-//         <p class="film-details__comment-text">${item.text}</p>
-//         <p class="film-details__comment-info">
-//           <span class="film-details__comment-author">${item.name}</span>
-//           <span class="film-details__comment-day">${item.date} days ago</span>
-//           <button class="film-details__comment-delete">Delete</button>
-//         </p>
-//       </div>
-//     </li>`;
-//   }).join(``);
-// };
 
 class Popup extends AbstractComponent {
   constructor({title, original, director, writers, actors,
@@ -120,7 +103,7 @@ class Popup extends AbstractComponent {
       const avatarElement = this.getElement().querySelector(`.film-details__add-emoji-label`).firstElementChild;
       const newCommentData = {
         avatar: avatarElement.src,
-        date: 0,
+        date: moment().diff(Date.now(), `minutes`),
         name: `Петька`,
         text: evt.target.value
       };
