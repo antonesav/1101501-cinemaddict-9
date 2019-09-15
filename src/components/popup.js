@@ -1,6 +1,7 @@
 import {Position, renderComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
 import Comment from "./comment";
+import moment from "moment";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -14,24 +15,6 @@ const getGenresQuantity = (genres) => {
   `;
 };
 
-// const getComment = (comments) => {
-//   return comments.map((item) => {
-//     return `
-//     <li class="film-details__comment">
-//       <span class="film-details__comment-emoji">
-//         <img src="${item.avatar}" width="55" height="55" alt="emoji">
-//       </span>
-//       <div>
-//         <p class="film-details__comment-text">${item.text}</p>
-//         <p class="film-details__comment-info">
-//           <span class="film-details__comment-author">${item.name}</span>
-//           <span class="film-details__comment-day">${item.date} days ago</span>
-//           <button class="film-details__comment-delete">Delete</button>
-//         </p>
-//       </div>
-//     </li>`;
-//   }).join(``);
-// };
 
 class Popup extends AbstractComponent {
   constructor({title, original, director, writers, actors,
@@ -58,11 +41,9 @@ class Popup extends AbstractComponent {
     this._age = age;
     this._changeEmojiHandler = this._changeEmojiHandler.bind(this);
     this._addCommentEnterKey = this._addCommentEnterKey.bind(this);
-    this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
 
     this._subscribeEvents();
   }
-
 
   _subscribeEvents() {
 
@@ -72,9 +53,6 @@ class Popup extends AbstractComponent {
 
     this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._changeEmojiHandler);
 
-    // this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
-    //   button.addEventListener(`click`, this._commentDeleteHandler);
-    // });
   }
 
 
@@ -90,24 +68,27 @@ class Popup extends AbstractComponent {
   }
 
 
-  _removeCommentElements() {
-    const quantityCommentElement = this.getElement().querySelector(`.film-details__comments-title`);
-    const commentsContainer = this.getElement().querySelector(`.film-details__comments-list`);
-
-    quantityCommentElement.remove();
-    renderComponent(this.getElement().querySelector(`.film-details__comments-wrap`), `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._comments.length}</span></h3>`, Position.BEFOREBEGIN);
-    commentsContainer.remove();
+  _updateCommentCount() {
+    const quantityCommentElement = this.getElement().querySelector(`.film-details__comments-count`);
+    quantityCommentElement.textContent = `${this._comments.length}`;
   }
 
-  _commentDeleteHandler(evt) {
-    evt.preventDefault();
-    evt.target.parentNode.parentNode.parentElement.remove();
+  _updateUserComment(data) {
+    const comment = new Comment(data);
+    renderComponent(this.getElement().querySelector(`.film-details__comments-list`), comment.getElement(), Position.BEFOREEND);
+    comment.getElement().addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      comment.removeElement();
+      const indexElement = this._comments.findIndex((currentComment) => currentComment === data);
+      this._comments.splice(indexElement, 1);
+      this._updateCommentCount();
+    });
   }
+
 
   _getComment(comments) {
     comments.forEach((item) => {
-      const comment = new Comment(item);
-      renderComponent(this.getElement().querySelector(`.film-details__new-comment`), `<ul class="film-details__comments-list">${comment.getElement()}</ul>`, Position.BEFOREBEGIN);
+      this._updateUserComment(item);
     });
   }
 
@@ -120,17 +101,16 @@ class Popup extends AbstractComponent {
     evt.preventDefault();
     if (this.getElement().querySelector(`.film-details__emoji-list input:checked`) && evt.target.value) {
       const avatarElement = this.getElement().querySelector(`.film-details__add-emoji-label`).firstElementChild;
-      this._comments.push({
+      const newCommentData = {
         avatar: avatarElement.src,
-        date: 0,
+        date: moment().diff(Date.now(), `minutes`),
         name: `Петька`,
         text: evt.target.value
-      });
+      };
 
-      this._removeCommentElements();
-      renderComponent(this.getElement().querySelector(`.film-details__new-comment`), `<ul class="film-details__comments-list">
-          ${this._getComment(this._comments)}
-          </ul>`, Position.BEFOREBEGIN);
+      this._comments.push(newCommentData);
+      this._updateUserComment(newCommentData);
+      this._updateCommentCount();
     }
   }
 
