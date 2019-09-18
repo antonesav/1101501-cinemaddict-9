@@ -6,6 +6,7 @@ import FilmList from "../components/films-list";
 import Sort from "../components/sort";
 import MovieController from "./movie-controller";
 import Menu from "../components/menu";
+import Statistic from "../components/statistic";
 
 const FILMLIST_CARD_COUNT = 5;
 const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
@@ -22,6 +23,7 @@ class PageController {
     this._filmList = new FilmList();
     this._sort = new Sort();
     this._menu = new Menu(this._cards);
+    this._statistic = new Statistic();
     this._filmListContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
   }
@@ -46,6 +48,8 @@ class PageController {
 
     renderComponent(filmsListElement, this._buttonShowMore.getElement(), Position.BEFOREEND);
 
+    renderComponent(this._container, this._statistic.getElement(), Position.BEFOREEND);
+
     const onLoadClick = () => {
       this._renderCards(this._cards, FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT);
     };
@@ -53,6 +57,12 @@ class PageController {
     this._buttonShowMore.getElement().addEventListener(`click`, onLoadClick);
 
     this._sort.getElement().addEventListener(`click`, (evt) => this._sortLinkClickHandler(evt));
+
+    this._menu.getElement().querySelector(`.main-navigation__item--additional`).
+    addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._statistic.getElement().classList.toggle(`visually-hidden`);
+    });
   }
 
 
@@ -117,7 +127,7 @@ class PageController {
     const clippedCards = cards.slice(this._cardsShownInCategory, addedCardsQuantity);
 
     clippedCards.forEach((item) => this._renderFilmCard(container, item));
-    this._cardsShownInCategory += cardsQuantity;
+    // this._cardsShownInCategory += cardsQuantity;
   }
 
 
@@ -125,6 +135,7 @@ class PageController {
     this._cards[this._cards.findIndex((it) => it === oldData)] = newData;
     this._copyCards[this._copyCards.findIndex((it) => it === oldData)] = newData;
     this._reRenderCards(this._cards, this._filmListContainerElement);
+    this._reRenderCharts(this._cards);
     this._menu.removeElement();
     renderComponent(this._container, this._menu.getElement(), Position.AFTERBEGIN);
   }
@@ -141,6 +152,14 @@ class PageController {
       if (index < this._cardsShownInList) {
         this._renderFilmCard(container, item);
       }
+    });
+  }
+
+  _reRenderCharts(cards) {
+    const filmsListExtraElements = document.querySelectorAll(`.films-list--extra .films-list__container`);
+    filmsListExtraElements.forEach((item) => {
+      item.innerHTML = ``;
+      this._renderCardInCharts(cards, item, CATEGORY_CARD_COUNT);
     });
   }
 
