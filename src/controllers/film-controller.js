@@ -4,12 +4,11 @@ import {renderComponent} from "../util";
 import MovieController from "./movie-controller";
 
 class FilmController {
-  constructor(container, cards, dataChangeHandler) {
+  constructor(container, mainContainer, cards, dataChangeHandler) {
     this._container = container;
+    this._mainContainer = mainContainer;
     this._cards = cards;
-    // this._quantity = quantity;
     this._dataChangeHandler = dataChangeHandler;
-    // this._cardsShownInList = 0;
     this.init();
   }
 
@@ -49,7 +48,7 @@ class FilmController {
 
     const clickCardHandler = (evt) => {
       if (!evt.target.classList.contains(`film-card__controls-item`)) {
-        this._renderPopupCard(filmCard, this._container);
+        this._renderPopupCard(filmCard, this._mainContainer);
       }
     };
 
@@ -59,18 +58,7 @@ class FilmController {
 
   // Отрисовываем все карточки в контейнер
   _renderCards(films) {
-    // const residualCards = films.length - this._cardsShownInList;
-
-    // if (cardsQuantity >= residualCards) {
-      // cardsQuantity = films.length;
-      // this._buttonShowMore.removeElement();
-    // }
-
-    // const addedCardsQuantity = this._cardsShownInList + cardsQuantity;
-    // const clippedCards = films.slice(this._cardsShownInList, addedCardsQuantity);
-
     films.forEach((item) => this._renderFilmCard(this._container, item));
-    // this._cardsShownInList += cardsQuantity;
   }
 
 
