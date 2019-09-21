@@ -52,7 +52,8 @@ export const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
 export const Position = {
   AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
+  BEFOREEND: `beforeend`,
+  BEFOREBEGIN: `beforebegin`,
 };
 
 export const createElement = (template) => {
@@ -69,6 +70,9 @@ export const renderComponent = (container, element, place) => {
       break;
     case Position.BEFOREEND:
       container.append(element);
+      break;
+    case Position.BEFOREBEGIN:
+      container.insertAdjacentHTML(`beforebegin`, element);
       break;
   }
 };

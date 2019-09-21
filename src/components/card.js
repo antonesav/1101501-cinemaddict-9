@@ -2,7 +2,7 @@ import {renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
 
 class Card extends AbstractComponent {
-  constructor({title, rating, year, duration, genre, poster, description, commentsQuantity, isWatchlist, isWatched, isFavorite}) {
+  constructor({title, rating, year, duration, genre, poster, description, comments, isWatchlist, isWatched, isFavorite}) {
     super();
     this._title = title;
     this._rating = rating;
@@ -11,7 +11,7 @@ class Card extends AbstractComponent {
     this._genre = genre;
     this._poster = poster;
     this._description = description;
-    this._commentsQuantity = commentsQuantity;
+    this._comments = comments;
     this._isWatchlist = isWatchlist;
     this._isWatched = isWatched;
     this._isFavorite = isFavorite;
@@ -28,11 +28,11 @@ class Card extends AbstractComponent {
         </p>
         <img src="./images/posters/${this._poster}" alt="" class="film-card__poster">
         <p class="film-card__description">${this._description}</p>
-        <a class="film-card__comments">${this._commentsQuantity} ${renderItemQuantity(this._commentsQuantity, `comment`)}</a>
+        <a class="film-card__comments">${this._comments.length} ${renderItemQuantity(this._comments.length, `comment`)}</a>
         <form class="film-card__controls">
-          <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${this._isWatchlist ? `film-card__controls-item--active` : ``}">Add to watchlist</button>
-          <button class="film-card__controls-item button film-card__controls-item--mark-as-watched  ${this._isWatched ? `film-card__controls-item--active` : ``}">Mark as watched</button>
-          <button class="film-card__controls-item button film-card__controls-item--favorite ${this._isFavorite ? `film-card__controls-item--active` : ``}">Mark as favorite</button>
+          <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${this._isWatchlist ? `film-card__controls-item--active` : ``}" data-action="watchlist">Add to watchlist</button>
+          <button class="film-card__controls-item button film-card__controls-item--mark-as-watched  ${this._isWatched ? `film-card__controls-item--active` : ``}" data-action="watched">Mark as watched</button>
+          <button class="film-card__controls-item button film-card__controls-item--favorite ${this._isFavorite ? `film-card__controls-item--active` : ``}" data-action="favorite">Mark as favorite</button>
         </form>
       </article>`;
   }

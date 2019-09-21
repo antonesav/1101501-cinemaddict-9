@@ -1,5 +1,7 @@
-import {renderItemQuantity} from "../util";
+import {Position, renderComponent, renderItemQuantity} from "../util";
 import AbstractComponent from "./abstract-component";
+import Comment from "./comment";
+import moment from "moment";
 
 const getGenresQuantity = (genres) => {
   const genreList = genres.map((item) => {
@@ -13,27 +15,12 @@ const getGenresQuantity = (genres) => {
   `;
 };
 
-const getComment = (comments) => {
-  return comments.map((item) => {
-    return `
-    <li class="film-details__comment">
-      <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${item.avatar}" width="55" height="55" alt="emoji">
-      </span>
-      <div>
-        <p class="film-details__comment-text">${item.text}</p>
-        <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${item.name}</span>
-          <span class="film-details__comment-day">${item.date} days ago</span>
-          <button class="film-details__comment-delete">Delete</button>
-        </p>
-      </div>
-    </li>`;
-  });
-};
 
 class Popup extends AbstractComponent {
-  constructor({title, original, director, writers, actors, rating, release, duration, country, genres, poster, description, comments, age}) {
+  constructor({title, original, director, writers, actors,
+    rating, release, duration, country, genres, poster,
+    description, isWatchlist, isWatched, isFavorite,
+    comments, age}) {
     super();
     this._title = title;
     this._original = original;
@@ -47,9 +34,86 @@ class Popup extends AbstractComponent {
     this._genres = genres;
     this._poster = poster;
     this._description = description;
+    this._isWatchlist = isWatchlist;
+    this._isWatched = isWatched;
+    this._isFavorite = isFavorite;
     this._comments = comments;
     this._age = age;
+    this._changeEmojiHandler = this._changeEmojiHandler.bind(this);
+    this._addCommentEnterKey = this._addCommentEnterKey.bind(this);
+
+    this._subscribeEvents();
   }
+
+  _subscribeEvents() {
+
+    this._getComment(this._comments);
+
+    this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._addCommentEnterKey);
+
+    this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._changeEmojiHandler);
+
+  }
+
+
+  _changeEmojiHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === `IMG`) {
+      const parentTarget = evt.target.parentElement.htmlFor;
+      evt.currentTarget.querySelector(`#${parentTarget}`).checked = true;
+
+      const labelEmojiElement = document.querySelector(`.film-details__add-emoji-label`);
+      labelEmojiElement.innerHTML = `<img src="${evt.target.src}" width="55" height="55" alt="emoji">`;
+    }
+  }
+
+
+  _updateCommentCount() {
+    const quantityCommentElement = this.getElement().querySelector(`.film-details__comments-count`);
+    quantityCommentElement.textContent = `${this._comments.length}`;
+  }
+
+  _updateUserComment(data) {
+    const comment = new Comment(data);
+    renderComponent(this.getElement().querySelector(`.film-details__comments-list`), comment.getElement(), Position.BEFOREEND);
+    comment.getElement().querySelector(`.film-details__comment-delete`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      comment.removeElement();
+      const indexElement = this._comments.findIndex((currentComment) => currentComment === data);
+      this._comments.splice(indexElement, 1);
+      this._updateCommentCount();
+    });
+  }
+
+
+  _getComment(comments) {
+    comments.forEach((item) => {
+      this._updateUserComment(item);
+    });
+  }
+
+
+  _addCommentEnterKey(evt) {
+    if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
+      return;
+    }
+
+    evt.preventDefault();
+    if (this.getElement().querySelector(`.film-details__emoji-list input:checked`) && evt.target.value) {
+      const avatarElement = this.getElement().querySelector(`.film-details__add-emoji-label`).firstElementChild;
+      const newCommentData = {
+        avatar: avatarElement.src,
+        date: moment().diff(Date.now(), `minutes`),
+        name: `Петька`,
+        text: evt.target.value
+      };
+
+      this._comments.push(newCommentData);
+      this._updateUserComment(newCommentData);
+      this._updateCommentCount();
+    }
+  }
+
 
   getTemplate() {
     return `<section class="film-details">
@@ -114,13 +178,13 @@ class Popup extends AbstractComponent {
         </div>
   
         <section class="film-details__controls">
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${this._isWatchlist ? `checked` : ``}>
           <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
   
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${this._isWatched ? `checked` : ``}>
           <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
   
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${this._isFavorite ? `checked` : ``}>
           <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
         </section>
       </div>
@@ -130,14 +194,14 @@ class Popup extends AbstractComponent {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._comments.length}</span></h3>
   
           <ul class="film-details__comments-list">
-          ${getComment(this._comments)}
+          
           </ul>
   
           <div class="film-details__new-comment">
             <div for="add-emoji" class="film-details__add-emoji-label"></div>
   
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" minlength="5"></textarea>
             </label>
   
             <div class="film-details__emoji-list">
