@@ -39,9 +39,9 @@ class Menu extends AbstractComponent {
   getTemplate() {
     fillFilters(this._cards);
     return `<nav class="main-navigation">
-      <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
+      <a href="#all" class="main-navigation__item main-navigation__item--active" data-label="all-films">All movies</a>
       ${getFilters(stats).join(``)}
-      <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
+      <a href="#stats" class="main-navigation__item main-navigation__item--additional" data-label="stats">Stats</a>
     </nav>`;
   }
 }

@@ -4,7 +4,6 @@ import Button from "../components/button";
 import FilmList from "../components/films-list";
 import Sort from "../components/sort";
 // import Menu from "../components/menu";
-import Statistic from "../components/statistic";
 import FilmController from "./film-controller";
 
 const FILMLIST_CARD_COUNT = 5;
@@ -12,7 +11,7 @@ const FILMLIST_ON_CLICK_BUTTON_CARDS_COUNT = 5;
 const CATEGORY_CARD_COUNT = 2;
 
 class PageController {
-  constructor(mainContainer, cards) {
+  constructor(mainContainer, cards, mainDataChangeHandler) {
     this._container = mainContainer;
     this._cards = cards;
     this._copyCards = cards.slice();
@@ -21,9 +20,9 @@ class PageController {
     this._buttonShowMore = new Button();
     this._filmList = new FilmList();
     this._sort = new Sort();
-    // this._menu = new Menu(this._cards);
-    this._statistic = new Statistic();
+    // this._statistic = new Statistic();
     this._filmListContainerElement = this._filmList.getElement().querySelector(`.films-list__container`);
+    this._mainDataChangeHandler = mainDataChangeHandler;
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
   }
 
@@ -31,9 +30,9 @@ class PageController {
 
     // renderComponent(this._container, this._menu.getElement(), Position.BEFOREEND);
 
-    renderComponent(this._container, this._statistic.getElement(), Position.BEFOREEND);
+    // renderComponent(this._container, this._statistic.getElement(), Position.BEFOREEND);
 
-    renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
+    // renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
 
     this._setFilmList();
 
@@ -66,14 +65,19 @@ class PageController {
       this._setFilmList();
     }
     this._filmList.getElement().classList.remove(`visually-hidden`);
+    this._sort.getElement().classList.remove(`visually-hidden`);
   }
 
   // Скрываем FILM-LIST
   hide() {
     this._filmList.getElement().classList.add(`visually-hidden`);
+    this._sort.getElement().classList.add(`visually-hidden`);
   }
 
   _setFilmList() {
+
+    renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
+
     renderComponent(this._container, this._filmList.getElement(), Position.BEFOREEND);
 
     const filmsListExtraElements = document.querySelectorAll(`.films-list--extra .films-list__container`);
@@ -91,7 +95,7 @@ class PageController {
 
   // ОСТАВИМ ЗДЕСЬ ТОЛЬКО ИЗМЕНЕНИЕ ДАННЫХ
   _dataChangeHandler(newData, oldData) {
-    this._cards[this._cards.findIndex((it) => it === oldData)] = newData;
+    this._mainDataChangeHandler(newData, oldData);
     this._copyCards[this._copyCards.findIndex((it) => it === oldData)] = newData;
     this._reRenderCards(this._filmListContainerElement, this._cards, this._cardsShownInList);
     this._reRenderCharts(this._cards);
