@@ -3,7 +3,6 @@ import {Position} from "../util";
 import Button from "../components/button";
 import FilmList from "../components/films-list";
 import Sort from "../components/sort";
-// import Menu from "../components/menu";
 import FilmController from "./film-controller";
 
 const FILMLIST_CARD_COUNT = 5;
