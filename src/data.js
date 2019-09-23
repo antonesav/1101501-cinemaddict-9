@@ -48,7 +48,7 @@ export const getCard = () => ({
   genre: getRandomValue(dataMock.genres),
   poster: getRandomValue(dataMock.posters),
   description: generateDescription(dataMock.description),
-  commentsQuantity: getRandomNumber(100),
+  // commentsQuantity: getRandomNumber(100),
   isWatchlist: getRandomBoolean(),
   isWatched: getRandomBoolean(),
   isFavorite: getRandomBoolean(),
