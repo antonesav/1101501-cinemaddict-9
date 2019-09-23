@@ -76,7 +76,7 @@ class Popup extends AbstractComponent {
   _updateUserComment(data) {
     const comment = new Comment(data);
     renderComponent(this.getElement().querySelector(`.film-details__comments-list`), comment.getElement(), Position.BEFOREEND);
-    comment.getElement().addEventListener(`click`, (evt) => {
+    comment.getElement().querySelector(`.film-details__comment-delete`).addEventListener(`click`, (evt) => {
       evt.preventDefault();
       comment.removeElement();
       const indexElement = this._comments.findIndex((currentComment) => currentComment === data);
