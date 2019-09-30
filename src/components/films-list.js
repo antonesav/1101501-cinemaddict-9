@@ -1,29 +1,19 @@
-import AbstractComponent from "./abstract-component";
-
-class FilmList extends AbstractComponent {
-  constructor() {
+import AbstractComponent from './abstract-component.js';
+export default class FilmsList extends AbstractComponent {
+  constructor(isExtra, title) {
     super();
+    this._isExtra = isExtra;
+    this._title = title;
   }
 
   getTemplate() {
-    return `<section class="films">
-      <section class="films-list">
-        <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-      <section class="films-list--extra">
-      <h2 class="films-list__title">Top rated</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-      <section class="films-list--extra">
-      <h2 class="films-list__title">Most commented</h2>
-        <div class="films-list__container">
-        </div>
-      </section>
-    </section>`;
+    return `<section class="films-list${this._isExtra ? `--extra` : ``}">
+    <h2 class="films-list__title ${this._isExtra ? `` : `visually-hidden`}">${this._title}</h2>
+
+    <div class="films-list__container">
+      
+    </div>
+    
+  </section>`;
   }
 }
-
-export default FilmList;
