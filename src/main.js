@@ -1,49 +1,80 @@
+import {AUTHORIZATION, END_POINT, CARDS_STORE_KEY, States} from "./utils/constants";
+import {removeElement, render, isOnline} from "./utils/utils";
+import MenuController from "./controllers/menu";
+import PageController from "./controllers/page";
+import SearchController from "./controllers/search";
+import StatisticsController from "./controllers/statistics";
 import Search from "./components/search";
-import User from "./components/user";
-import Message from "./components/films-list-empty";
-import {mockCards} from "./data";
-import {Position} from "./util";
-import {renderComponent} from "./util";
-import PageController from "./controllers/page-controller";
-import MenuController from "./controllers/menu-controller";
-import StatisticController from "./controllers/statistic-controller";
+import ProfileRating from "./components/profile";
+import Loader from "./components/loader";
+import StatisticsText from "./components/statistic-text";
+import ModelCard from "./models/film";
+import API from "./api";
+import Provider from "./provider";
+import Store from "./store";
 
-const mainElement = document.querySelector(`.main`);
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+const store = new Store({key: CARDS_STORE_KEY, storage: localStorage});
+const provider = new Provider({api, store, isOnline});
 const headerElement = document.querySelector(`.header`);
-const footerElement = document.querySelector(`.footer .footer__statistics p`);
-footerElement.textContent = `${mockCards().length} movies inside`;
+const mainElement = document.querySelector(`.main`);
+const footerElement = document.querySelector(`.footer`);
+const search = new Search();
+const loader = new Loader();
 
-const cards = mockCards();
-
-const dataChangeHandler = (newData, oldData) => {
-  cards[cards.findIndex((it) => it === oldData)] = newData;
-  menuController.init();
-  // this._menu.removeElement();
-  // renderComponent(this._container, this._menu.getElement(), Position.AFTERBEGIN);
+const onDataChange = (update) => {
+  provider.updateCard({
+    id: update.id,
+    data: ModelCard.toRAW(update),
+  })
+    .then(() => {
+      provider.getCards()
+        .then((updatedCards) => {
+          renderPage(updatedCards);
+        });
+    });
 };
 
-const searchElement = new Search();
-const pageController = new PageController(mainElement, cards, dataChangeHandler);
-const menuController = new MenuController(mainElement, cards, dataChangeHandler);
-const statisticController = new StatisticController(mainElement);
+const pageController = new PageController(mainElement, onDataChange);
+const searchController = new SearchController(mainElement, search, onDataChange);
+const statisticsController = new StatisticsController(mainElement, onDataChange);
+const menuController = new MenuController(mainElement, search, searchController, pageController, statisticsController, onDataChange);
 
-menuController.init();
 pageController.init();
-statisticController.init();
-renderComponent(mainElement, new Message().getElement(), Position.BEFOREEND);
-renderComponent(headerElement, searchElement.getElement(), Position.BEFOREEND);
-renderComponent(headerElement, new User().getElement(), Position.BEFOREEND);
+searchController.init();
+statisticsController.init();
+menuController.init();
 
-document.querySelector(`.main-navigation`).addEventListener(`click`, function (evt) {
-  evt.preventDefault();
-  switch (evt.target.dataset.label) {
-    case `all-films`:
-      pageController.show(cards);
-      statisticController.hide();
-      break;
-    case `stats`:
-      pageController.hide();
-      statisticController.show();
-      break;
+render(headerElement, search.getElement());
+render(mainElement, loader.getElement());
+
+const renderPage = ((cards) => {
+  removeElement(loader.getElement());
+  loader.removeElement();
+
+  const profileRating = new ProfileRating(cards);
+  removeElement(headerElement.querySelector(`.profile`));
+  render(headerElement, profileRating.getElement());
+
+  const statisticsText = new StatisticsText(cards);
+  removeElement(footerElement.querySelector(`.footer__statistics`));
+  render(footerElement, statisticsText.getElement());
+  pageController.show(cards);
+  menuController.show(cards);
+
+  if (menuController.getState() === States.SEARCH) {
+    searchController.show(cards);
+    pageController.hide();
+    menuController.hide();
   }
 });
+
+window.addEventListener(`offline`, () => {
+  document.title = `${document.title} [OFFLINE]`;
+});
+window.addEventListener(`online`, () => {
+  document.title = document.title.split(` [OFFLINE]`)[0];
+  provider.syncCards();
+});
+
+provider.getCards().then((cards) => renderPage(cards));

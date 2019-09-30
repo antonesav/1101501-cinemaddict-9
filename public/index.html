@@ -34,6 +34,15 @@
     <p>130 291 movies inside</p>
   </section>
 </footer>
-<script src="./bundle.js"></script>
+<script src="./bundle.js"> </script>
+<script>
+  navigator.serviceWorker.register('./sw.js')
+    .then((reg) => {
+      console.log(`Registration succeeded. Scope is ${reg.scope}`);
+    })
+    .catch((error) => {
+      console.log(`Registration failed with ${error}`);
+    });
+</script>
 </body>
 </html>
