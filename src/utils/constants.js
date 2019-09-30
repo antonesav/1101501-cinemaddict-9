@@ -40,20 +40,11 @@ const Description = {
     TO_DISPLAY: 139,
   },
 };
-const UserRating = {
-  MILESTONES: {
-    FIRST: 1,
-    SECOND: 10,
-    THIRD: 11,
-    FOURTH: 20,
-    FIFTH: 21,
-  },
-  TITLES: {
-    FIRST: `Novice`,
-    SECOND: `Fan`,
-    THIRD: `Movie Buff`,
-  },
-};
+const UserRank = [
+  {title: `Novice`, minRating: 1},
+  {title: `Fan`, minRating: 10},
+  {title: `Movie Buff`, minRating: 21}
+];
 const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
@@ -151,4 +142,4 @@ const ErrorTypes = {
   RATING_INPUT: `rating-input-error`,
 };
 
-export {FILMS_AMOUNT, CATEGORY_FILMS_AMOUNT, MIN_SEARCH_STRING_LENGTH, AUTHORIZATION, END_POINT, CARDS_STORE_KEY, COMMENTS_STORE_KEY, Emojis, Description, UserRating, Position, ListTitles, Sorting, Actions, Screens, States, Filters, Method, ErrorTypes};
+export {FILMS_AMOUNT, CATEGORY_FILMS_AMOUNT, MIN_SEARCH_STRING_LENGTH, AUTHORIZATION, END_POINT, CARDS_STORE_KEY, COMMENTS_STORE_KEY, Emojis, Description, UserRank, Position, ListTitles, Sorting, Actions, Screens, States, Filters, Method, ErrorTypes};

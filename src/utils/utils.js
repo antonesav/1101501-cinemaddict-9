@@ -1,4 +1,4 @@
-import {Description, Position, UserRating} from "./constants";
+import {Description, Position, UserRank} from "./constants";
 
 
 const trimString = (string) => {
@@ -24,19 +24,8 @@ const removeElement = (element) => {
     element.remove();
   }
 };
-const getUserTitle = (amount) => {
-  let title;
-
-  if (amount >= UserRating.MILESTONES.FIRST && amount <= UserRating.MILESTONES.SECOND) {
-    title = UserRating.TITLES.FIRST;
-    return title;
-  } else if (amount >= UserRating.MILESTONES.THIRD && amount <= UserRating.MILESTONES.FOURTH) {
-    title = UserRating.TITLES.SECOND;
-    return title;
-  }
-
-  title = UserRating.TITLES.THIRD;
-  return title;
+const getUserTitle = (countWatchedFilms) => {
+  return countWatchedFilms > 0 ? UserRank.filter((item) => item.minRating <= countWatchedFilms).pop().title : ``;
 };
 const countDuplicateElements = (list) => {
   let counts = {};
