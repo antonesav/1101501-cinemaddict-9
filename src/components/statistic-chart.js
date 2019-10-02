@@ -1,10 +1,9 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractComponent from './abstract-component';
 
-export default class StatChart extends AbstractComponent {
-
+class StatisticChart extends AbstractComponent {
   getTemplate() {
-    return `<div class="statistic__chart-wrap">
-        <canvas class="statistic__chart" width="1000"></canvas>
-      </div>`;
+    return `<canvas class="statistic__chart" width="1000"></canvas>`;
   }
 }
+
+export default StatisticChart;
