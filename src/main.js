@@ -1,80 +1,180 @@
-import {AUTHORIZATION, END_POINT, CARDS_STORE_KEY, States} from "./utils/constants";
-import {removeElement, render, isOnline} from "./utils/utils";
-import MenuController from "./controllers/menu";
-import PageController from "./controllers/page";
-import SearchController from "./controllers/search";
-import StatisticsController from "./controllers/statistics";
-import Search from "./components/search";
-import ProfileRating from "./components/profile";
-import Loader from "./components/loader";
-import StatisticsText from "./components/statistic-text";
-import ModelCard from "./models/film";
-import API from "./api";
-import Provider from "./provider";
-import Store from "./store";
+import Search from './components/search';
+import Profile from './components/profile';
+import PopupWrapper from './components/popup-wrapper';
+import Loading from './components/loading';
+import API from './api';
+import PageController from './controllers/page-controller';
+import SearchController from './controllers/search-controller';
+import MenuController from './controllers/menu-controller';
+import ChartController from './controllers/chart-controller';
+import {render, remove} from './utils';
+import {MIN_SEARCH_SYMBOLS, COUNT_FILM_CARDS, AUTHORIZATION, SERVER, ActionType} from './constants';
+import {getRang} from './utils';
 
-const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-const store = new Store({key: CARDS_STORE_KEY, storage: localStorage});
-const provider = new Provider({api, store, isOnline});
-const headerElement = document.querySelector(`.header`);
-const mainElement = document.querySelector(`.main`);
-const footerElement = document.querySelector(`.footer`);
+let countFilmCard = COUNT_FILM_CARDS;
+let filterName = null;
+let menuName = null;
+
+const headerWrapper = document.querySelector(`.header`);
+const mainWrapper = document.querySelector(`.main`);
+const footerFilmCountBlock = document.querySelector(`.footer__statistics p`);
+
+const api = new API({authorization: AUTHORIZATION, server: SERVER});
 const search = new Search();
-const loader = new Loader();
+const popupWrapper = new PopupWrapper();
+const loading = new Loading();
 
-const onDataChange = (update) => {
-  provider.updateCard({
-    id: update.id,
-    data: ModelCard.toRAW(update),
-  })
-    .then(() => {
-      provider.getCards()
-        .then((updatedCards) => {
-          renderPage(updatedCards);
-        });
-    });
+const changeCountFilmCard = (addCount) => {
+  if (addCount === null) {
+    countFilmCard = COUNT_FILM_CARDS;
+    return countFilmCard;
+  }
+  countFilmCard += addCount;
+  return countFilmCard;
 };
 
-const pageController = new PageController(mainElement, onDataChange);
-const searchController = new SearchController(mainElement, search, onDataChange);
-const statisticsController = new StatisticsController(mainElement, onDataChange);
-const menuController = new MenuController(mainElement, search, searchController, pageController, statisticsController, onDataChange);
+const changeCurrentMenu = (filterNameItem, nameMenuItem) => {
+  filterName = filterNameItem;
+  menuName = nameMenuItem;
 
-pageController.init();
-searchController.init();
-statisticsController.init();
-menuController.init();
+  return {filterName, menuName};
+};
 
-render(headerElement, search.getElement());
-render(mainElement, loader.getElement());
+const changeSearchInfo = (isSearch) => {
+  menuController.setSearch(isSearch);
+  pageController.setSearch(isSearch);
+  searchController.setSearch(isSearch);
+};
 
-const renderPage = ((cards) => {
-  removeElement(loader.getElement());
-  loader.removeElement();
+const onSearchCloseButtonClick = () => {
+  chartController.hide();
+  searchController.hide();
+  changeSearchInfo(false);
+  onDataChange(ActionType.CREATE);
+};
 
-  const profileRating = new ProfileRating(cards);
-  removeElement(headerElement.querySelector(`.profile`));
-  render(headerElement, profileRating.getElement());
+const fetchUpdatedMovie = (updated, cb) => {
+  api.updateMovie({
+    id: updated.id,
+    movie: updated.toRAW()
+  })
+  .then(() => api.getMovies())
+  .then((movies) => {
+    pageController.show(movies);
+    menuController.show(movies);
+    searchController.show(movies);
+    cb();
+  });
+};
 
-  const statisticsText = new StatisticsText(cards);
-  removeElement(footerElement.querySelector(`.footer__statistics`));
-  render(footerElement, statisticsText.getElement());
-  pageController.show(cards);
-  menuController.show(cards);
+const fetchAllMovies = () => {
+  render(mainWrapper, loading.getElement());
+  api.getMovies().then((movies) => {
+    remove(loading.getElement());
+    loading.removeElement();
+    pageController.show(movies);
+    menuController.show(movies);
+    searchController.show(movies);
+    footerFilmCountBlock.textContent = `${movies.length} movies inside`;
+  });
+};
 
-  if (menuController.getState() === States.SEARCH) {
-    searchController.show(cards);
-    pageController.hide();
+const fetchCreatedComment = (updated, cb, cbError) => {
+  api.createComment({
+    id: updated.movieId,
+    comment: updated.comment
+  })
+  .catch(() => {
+    cbError();
+  })
+  .then(() => api.getMovies())
+  .then((movies) => {
+    pageController.show(movies);
+    menuController.show(movies);
+    cb();
+  });
+};
+
+const fetchUndeletedComments = (updated, cb, cbError) => {
+  api.deleteComment({
+    commentId: updated.id
+  })
+  .catch(() => {
+    cbError();
+  })
+  .then(() => api.getMovies())
+  .then((movies) => {
+    pageController.show(movies);
+    menuController.show(movies);
+    cb();
+  });
+};
+
+const fetchUpdatedRating = (updated, cb, cbError) => {
+  api.updateMovie({
+    id: updated.id,
+    movie: updated.toRAW()
+  })
+  .then(() => api.getMovies())
+  .then((movies) => {
+    pageController.show(movies);
+    menuController.show(movies);
+    searchController.show(movies);
+    cb();
+  }).catch(() => {
+    cbError();
+  });
+};
+
+const onDataChange = (actionType, updated, cb, cbError) => {
+  switch (actionType) {
+    case ActionType.UPDATE:
+      fetchUpdatedMovie(updated, cb);
+      break;
+    case ActionType.CREATE:
+      fetchAllMovies();
+      break;
+    case ActionType.CREATE_COMMENT:
+      fetchCreatedComment(updated, cb, cbError);
+      break;
+    case ActionType.DELETE_COMMENT:
+      fetchUndeletedComments(updated, cb, cbError);
+      break;
+    case ActionType.UPDATE_RATING:
+      fetchUpdatedRating(updated, cb, cbError);
+      break;
+    default:
+      throw new Error(`Incorrect ActionType property`);
+  }
+};
+
+render(headerWrapper, search.getElement());
+
+api.getMovies().then((movies) => {
+  const watchedFilms = movies.filter((elem) => elem.isViewed);
+  const profile = new Profile(getRang(watchedFilms.length));
+  render(headerWrapper, profile.getElement());
+});
+
+search.getElement().querySelector(`.search__field`).addEventListener(`keyup`, (evt) => {
+  if (evt.target.value.length >= MIN_SEARCH_SYMBOLS) {
     menuController.hide();
+    chartController.hide();
+    pageController.hide();
+    changeSearchInfo(true);
+    api.getMovies().then((movies) => searchController.show(movies));
+  } else if (evt.target.value.length === 0) {
+    chartController.hide();
+    searchController.hide();
+    changeSearchInfo(false);
+    onDataChange(ActionType.CREATE);
   }
 });
 
-window.addEventListener(`offline`, () => {
-  document.title = `${document.title} [OFFLINE]`;
-});
-window.addEventListener(`online`, () => {
-  document.title = document.title.split(` [OFFLINE]`)[0];
-  provider.syncCards();
-});
+const pageController = new PageController(mainWrapper, popupWrapper, onDataChange, changeCountFilmCard);
+const searchController = new SearchController(mainWrapper, popupWrapper, search, onDataChange, onSearchCloseButtonClick);
+const chartController = new ChartController(mainWrapper);
+const menuController = new MenuController(mainWrapper, pageController, searchController, chartController, changeCountFilmCard, changeCurrentMenu);
 
-provider.getCards().then((cards) => renderPage(cards));
+pageController.setCountFilmCard(countFilmCard);
+onDataChange(ActionType.CREATE);
